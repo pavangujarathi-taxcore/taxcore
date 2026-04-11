@@ -147,8 +147,8 @@ export function getHeadOfIncome(client: Client): string {
   return legacy || "Salaried";
 }
 
-// Theme system
-export type ThemeKey = "burgundy" | "yellow" | "navy" | "forestgreen" | "teal" | "coral" | "mint" | "sky";
+// Theme system - 4 Premium Themes
+export type ThemeKey = "burgundy" | "yellow" | "sky" | "purple";
 
 export interface ThemeConfig {
   key: ThemeKey;
@@ -181,122 +181,42 @@ export interface ThemeConfig {
 export const THEMES: Record<ThemeKey, ThemeConfig> = {
   burgundy: {
     key: "burgundy",
-    label: "Burgundy",
-    primary: "#8B3A3A",           // Lighter burgundy (was #6B1414)
-    primaryLight: "rgba(139,58,58,0.06)",
-    gold: "#E8D4A0",              // Softer gold (was #C9A84C)
-    activeHighlight: "rgba(232,212,160,0.12)",
-    subtitle: "#E8D4A0",
-    logoIconBg: "#E8D4A0",
-    logoIconText: "#8B3A3A",
-    activeNavText: "#E8D4A0",
-    activeNavBorder: "#E8D4A0",
-    avatarBg: "#E8D4A0",
-    avatarText: "#8B3A3A",
-    pageTitleColor: "#8B3A3A",
+    label: "Linen & Burgundy",
+    primary: "#A05858",           // More soothing, lighter burgundy
+    primaryLight: "rgba(160,88,88,0.06)",
+    gold: "#F0E4D0",              // Warm linen/cream color
+    activeHighlight: "rgba(240,228,208,0.12)",
+    subtitle: "#F0E4D0",
+    logoIconBg: "#F0E4D0",
+    logoIconText: "#A05858",
+    activeNavText: "#F0E4D0",
+    activeNavBorder: "#F0E4D0",
+    avatarBg: "#F0E4D0",
+    avatarText: "#A05858",
+    pageTitleColor: "#A05858",
   },
   yellow: {
     key: "yellow",
-    label: "Olive Gold",
-    primary: "#5C5C2E",            // Lighter olive (was #3D3D0A)
-    primaryLight: "rgba(92,92,46,0.06)",
-    gold: "#D4C576",               // Softer gold (was #BFA84A)
-    activeHighlight: "rgba(212,197,118,0.12)",
-    subtitle: "#D4C576",
-    logoIconBg: "#D4C576",
-    logoIconText: "#5C5C2E",
-    activeNavText: "#D4C576",
-    activeNavBorder: "#D4C576",
-    avatarBg: "#D4C576",
-    avatarText: "#5C5C2E",
-    pageTitleColor: "#5C5C2E",
-  },
-  navy: {
-    key: "navy",
-    label: "Navy Blue",
-    primary: "#1E3A5F",            // Lighter navy (was #0D2137)
-    primaryLight: "rgba(30,58,95,0.06)",
-    gold: "#7FB3E8",               // Softer blue (was #5B9BD5)
-    activeHighlight: "rgba(127,179,232,0.12)",
-    subtitle: "#A5CEF0",
-    logoIconBg: "#7FB3E8",
-    logoIconText: "#FFFFFF",
-    activeNavText: "#A5CEF0",
-    activeNavBorder: "#7FB3E8",
-    avatarBg: "#7FB3E8",
-    avatarText: "#FFFFFF",
-    pageTitleColor: "#1E3A5F",
-  },
-  forestgreen: {
-    key: "forestgreen",
-    label: "Forest Green",
-    primary: "#2D5A3D",            // Lighter forest (was #1A3A22)
-    primaryLight: "rgba(45,90,61,0.06)",
-    gold: "#6EC99A",               // Softer green (was #4CAF7D)
-    activeHighlight: "rgba(110,201,154,0.12)",
-    subtitle: "#9DE5C0",
-    logoIconBg: "#6EC99A",
-    logoIconText: "#FFFFFF",
-    activeNavText: "#9DE5C0",
-    activeNavBorder: "#6EC99A",
-    avatarBg: "#6EC99A",
-    avatarText: "#FFFFFF",
-    pageTitleColor: "#2D5A3D",
-  },
-  teal: {
-    key: "teal",
-    label: "Fresh Teal 💎",
-    primary: "#2BA89F",            // Lighter teal (was #0D9488)
-    primaryLight: "rgba(43,168,159,0.06)",
-    gold: "#5DD5C9",               // Softer teal (was #14B8A6)
-    activeHighlight: "rgba(93,213,201,0.12)",
-    subtitle: "#7FE5DA",
-    logoIconBg: "#5DD5C9",
-    logoIconText: "#FFFFFF",
-    activeNavText: "#7FE5DA",
-    activeNavBorder: "#5DD5C9",
-    avatarBg: "#5DD5C9",
-    avatarText: "#FFFFFF",
-    pageTitleColor: "#2BA89F",
-  },
-  coral: {
-    key: "coral",
-    label: "Coral Sunset 🌅",
-    primary: "#F07142",            // Lighter coral (was #EA580C)
-    primaryLight: "rgba(240,113,66,0.06)",
-    gold: "#FCA876",               // Softer coral (was #FB923C)
-    activeHighlight: "rgba(252,168,118,0.12)",
-    subtitle: "#FDC49E",
-    logoIconBg: "#FCA876",
-    logoIconText: "#FFFFFF",
-    activeNavText: "#FDC49E",
-    activeNavBorder: "#FCA876",
-    avatarBg: "#FCA876",
-    avatarText: "#FFFFFF",
-    pageTitleColor: "#F07142",
-  },
-  mint: {
-    key: "mint",
-    label: "Mint Fresh 🌿",
-    primary: "#34A87E",            // Lighter mint (was #059669)
-    primaryLight: "rgba(52,168,126,0.06)",
-    gold: "#5FD4A7",               // Softer mint (was #10B981)
-    activeHighlight: "rgba(95,212,167,0.12)",
-    subtitle: "#8BE5C0",
-    logoIconBg: "#5FD4A7",
-    logoIconText: "#FFFFFF",
-    activeNavText: "#8BE5C0",
-    activeNavBorder: "#5FD4A7",
-    avatarBg: "#5FD4A7",
-    avatarText: "#FFFFFF",
-    pageTitleColor: "#34A87E",
+    label: "Premium Gold",
+    primary: "#6B6B3A",            // Rich, premium olive
+    primaryLight: "rgba(107,107,58,0.06)",
+    gold: "#E6D899",               // Luxurious champagne gold
+    activeHighlight: "rgba(230,216,153,0.12)",
+    subtitle: "#E6D899",
+    logoIconBg: "#E6D899",
+    logoIconText: "#6B6B3A",
+    activeNavText: "#E6D899",
+    activeNavBorder: "#E6D899",
+    avatarBg: "#E6D899",
+    avatarText: "#6B6B3A",
+    pageTitleColor: "#6B6B3A",
   },
   sky: {
     key: "sky",
-    label: "Sky Blue ☁️",
-    primary: "#3B9FD9",            // Lighter sky (was #0284C7)
+    label: "Sky Blue",
+    primary: "#3B9FD9",            // Fresh sky blue
     primaryLight: "rgba(59,159,217,0.06)",
-    gold: "#62BFED",               // Softer sky (was #0EA5E9)
+    gold: "#62BFED",               // Bright sky accent
     activeHighlight: "rgba(98,191,237,0.12)",
     subtitle: "#8DD4F5",
     logoIconBg: "#62BFED",
@@ -306,5 +226,21 @@ export const THEMES: Record<ThemeKey, ThemeConfig> = {
     avatarBg: "#62BFED",
     avatarText: "#FFFFFF",
     pageTitleColor: "#3B9FD9",
+  },
+  purple: {
+    key: "purple",
+    label: "Royal Purple",
+    primary: "#6B5B95",            // Rich royal purple
+    primaryLight: "rgba(107,91,149,0.06)",
+    gold: "#C5B8E0",               // Soft lavender accent
+    activeHighlight: "rgba(197,184,224,0.12)",
+    subtitle: "#D6CDEB",
+    logoIconBg: "#C5B8E0",
+    logoIconText: "#FFFFFF",
+    activeNavText: "#D6CDEB",
+    activeNavBorder: "#C5B8E0",
+    avatarBg: "#C5B8E0",
+    avatarText: "#FFFFFF",
+    pageTitleColor: "#6B5B95",
   },
 };
