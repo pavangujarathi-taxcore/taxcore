@@ -495,12 +495,27 @@ export const storage = {
   getClients: (): Client[] => cache.clients,
 
   saveClients: (clients: Client[]): void => {
+    const isDelete = clients.length < cache.clients.length;
     cache.clients = clients;
     lsSet(KEYS.clients, clients);
     dispatchChange(KEYS.clients);
-    bgSync(async () => {
-      await saveAppData(buildAppDataSnapshot());
-    }, "saveClients");
+    
+    // Use immediate save for delete operations to prevent reappearance bug
+    if (isDelete) {
+      saveAppData(buildAppDataSnapshot())
+        .then(() => console.log("[storage] Immediate delete sync successful"))
+        .catch((err) => {
+          console.error("[storage] Immediate delete sync failed:", err);
+          // Fallback to bgSync on failure
+          bgSync(async () => {
+            await saveAppData(buildAppDataSnapshot());
+          }, "saveClients");
+        });
+    } else {
+      bgSync(async () => {
+        await saveAppData(buildAppDataSnapshot());
+      }, "saveClients");
+    }
   },
 
   // ─── Documents ───────────────────────────────────────────────────────────
@@ -508,12 +523,25 @@ export const storage = {
   getDocuments: (): DocumentInward[] => cache.documents,
 
   saveDocuments: (docs: DocumentInward[]): void => {
+    const isDelete = docs.length < cache.documents.length;
     cache.documents = docs;
     lsSet(KEYS.documents, docs);
     dispatchChange(KEYS.documents);
-    bgSync(async () => {
-      await saveAppData(buildAppDataSnapshot());
-    }, "saveDocuments");
+    
+    if (isDelete) {
+      saveAppData(buildAppDataSnapshot())
+        .then(() => console.log("[storage] Immediate delete sync successful"))
+        .catch((err) => {
+          console.error("[storage] Immediate delete sync failed:", err);
+          bgSync(async () => {
+            await saveAppData(buildAppDataSnapshot());
+          }, "saveDocuments");
+        });
+    } else {
+      bgSync(async () => {
+        await saveAppData(buildAppDataSnapshot());
+      }, "saveDocuments");
+    }
   },
 
   // ─── Work Processing ─────────────────────────────────────────────────────
@@ -521,12 +549,25 @@ export const storage = {
   getWork: (): WorkProcessing[] => cache.work,
 
   saveWork: (work: WorkProcessing[]): void => {
+    const isDelete = work.length < cache.work.length;
     cache.work = work;
     lsSet(KEYS.work, work);
     dispatchChange(KEYS.work);
-    bgSync(async () => {
-      await saveAppData(buildAppDataSnapshot());
-    }, "saveWork");
+    
+    if (isDelete) {
+      saveAppData(buildAppDataSnapshot())
+        .then(() => console.log("[storage] Immediate delete sync successful"))
+        .catch((err) => {
+          console.error("[storage] Immediate delete sync failed:", err);
+          bgSync(async () => {
+            await saveAppData(buildAppDataSnapshot());
+          }, "saveWork");
+        });
+    } else {
+      bgSync(async () => {
+        await saveAppData(buildAppDataSnapshot());
+      }, "saveWork");
+    }
   },
 
   // ─── Billing ─────────────────────────────────────────────────────────────
@@ -534,12 +575,25 @@ export const storage = {
   getBilling: (): Billing[] => cache.billing,
 
   saveBilling: (billing: Billing[]): void => {
+    const isDelete = billing.length < cache.billing.length;
     cache.billing = billing;
     lsSet(KEYS.billing, billing);
     dispatchChange(KEYS.billing);
-    bgSync(async () => {
-      await saveAppData(buildAppDataSnapshot());
-    }, "saveBilling");
+    
+    if (isDelete) {
+      saveAppData(buildAppDataSnapshot())
+        .then(() => console.log("[storage] Immediate delete sync successful"))
+        .catch((err) => {
+          console.error("[storage] Immediate delete sync failed:", err);
+          bgSync(async () => {
+            await saveAppData(buildAppDataSnapshot());
+          }, "saveBilling");
+        });
+    } else {
+      bgSync(async () => {
+        await saveAppData(buildAppDataSnapshot());
+      }, "saveBilling");
+    }
   },
 
   // ─── Audit Logs ───────────────────────────────────────────────────────────

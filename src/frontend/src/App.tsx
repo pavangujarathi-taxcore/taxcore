@@ -20,6 +20,7 @@ const WorkProcessingPage = lazy(() => import("./pages/WorkProcessingPage"));
 const OutwardBillingPage = lazy(() => import("./pages/OutwardBillingPage"));
 const UserManagementPage = lazy(() => import("./pages/UserManagementPage"));
 const ExportPage = lazy(() => import("./pages/ExportPage"));
+const ImportPage = lazy(() => import("./pages/ImportPage"));
 const SuperAdminPage = lazy(() => import("./pages/SuperAdminPage"));
 const AuditLogPage = lazy(() => import("./pages/AuditLogPage"));
 const SettingsPage = lazy(() => import("./pages/SettingsPage"));
@@ -110,7 +111,7 @@ export default function App() {
       });
   }, []);
 
-  // Auto-refresh from canister every 30 seconds when logged in
+  // Auto-refresh from canister every 2 seconds when logged in (real-time sync)
   // biome-ignore lint/correctness/useExhaustiveDependencies: user.id is the stable identity key
   useEffect(() => {
     if (!user) return;
@@ -118,7 +119,7 @@ export default function App() {
     silentRefreshFromCanister().catch(() => {});
     const interval = setInterval(() => {
       silentRefreshFromCanister().catch(() => {});
-    }, 5_000);
+    }, 2_000); // Changed from 5s to 2s for near real-time sync
     return () => clearInterval(interval);
   }, [user]);
 
@@ -231,6 +232,8 @@ export default function App() {
         );
       case "export":
         return <ExportPage />;
+      case "import":
+        return <ImportPage />;
       case "audit-log":
         return <AuditLogPage user={user} />;
       case "settings":

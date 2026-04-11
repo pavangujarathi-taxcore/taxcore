@@ -11,6 +11,7 @@ import {
   Briefcase,
   ClipboardList,
   Download,
+  Upload,
   Eye,
   EyeOff,
   LayoutDashboard,
@@ -59,6 +60,7 @@ const ownerNavItems: {
   },
   { id: "audit-log", label: "Audit Log", icon: ClipboardList, ownerOnly: true },
   { id: "export", label: "Export", icon: Download },
+  { id: "import", label: "Import", icon: Upload },
   {
     id: "settings",
     label: "Settings",
@@ -89,6 +91,7 @@ export const pageTitles: Record<Page, string> = {
   billing: "Outward & Billing",
   "user-management": "User Management",
   export: "Export Data",
+  import: "Import Data",
   "super-admin": "Administrator Panel",
   "audit-log": "Audit Log",
   settings: "Settings",

@@ -133,6 +133,7 @@ export type Page =
   | "billing"
   | "user-management"
   | "export"
+  | "import"
   | "super-admin"
   | "audit-log"
   | "settings";
