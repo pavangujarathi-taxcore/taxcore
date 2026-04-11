@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { onStorageChange, storage } from "../data/storage";
+import { onStorageChange, storage } from "../data/storage-api";
 import type { AuditLogEntry, User } from "../types";
 
 function toLocalDateInputValue(date: Date): string {

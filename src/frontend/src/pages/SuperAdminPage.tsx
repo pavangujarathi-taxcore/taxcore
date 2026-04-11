@@ -32,7 +32,7 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useTheme } from "../contexts/ThemeContext";
-import { onStorageChange, saveUsersNow, storage } from "../data/storage";
+import { onStorageChange, saveUsersNow, storage } from "../data/storage-api";
 import type { AuditLogEntry, FirmAccount, User } from "../types";
 
 const ADMIN_PROFILE_COMPLETE_KEY = "taxcore_admin_profile_complete";

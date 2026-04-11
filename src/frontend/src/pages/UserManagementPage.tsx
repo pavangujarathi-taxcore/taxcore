@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Crown, Eye, EyeOff, Plus, Trash2, UserCheck } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { onStorageChange, saveUsersNow, storage } from "../data/storage";
+import { onStorageChange, saveUsersNow, storage } from "../data/storage-api";
 import type { User } from "../types";
 
 function isValidEmail(v: string): boolean {

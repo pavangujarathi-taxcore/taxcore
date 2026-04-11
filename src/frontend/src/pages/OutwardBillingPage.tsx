@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/select";
 import { Save, Search } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { onStorageChange, storage } from "../data/storage";
+import { onStorageChange, storage } from "../data/storage-api";
 import type { Billing } from "../types";
 
 export default function OutwardBillingPage() {

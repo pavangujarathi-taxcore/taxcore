@@ -9,7 +9,7 @@ import {
   saveUserDatabaseNow,
   storage,
   whenInitialized,
-} from "../data/storage";
+} from "../data/storage-api";
 import type { FirmAccount, User } from "../types";
 
 interface LoginPageProps {

@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Download, FileSpreadsheet } from "lucide-react";
-import { storage } from "../data/storage";
+import { storage } from "../data/storage-api";
 import { getHeadOfIncome } from "../types";
 
 function escapeCell(val: unknown): string {

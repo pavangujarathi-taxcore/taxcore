@@ -12,7 +12,7 @@ import {
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import * as XLSX from "xlsx";
-import { storage, getPanCategory } from "../data/storage";
+import { storage, getPanCategory } from "../data/storage-api";
 import { getHeadOfIncome } from "../types";
 import type { Client } from "../types";
 

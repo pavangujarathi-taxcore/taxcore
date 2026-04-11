@@ -38,7 +38,7 @@ import {
   getPanCategory,
   onStorageChange,
   storage,
-} from "../data/storage";
+} from "../data/storage-api";
 import type { Client, WorkProcessing } from "../types";
 import { getCurrentTaxYear, getTaxYears } from "../utils/taxYears";
 

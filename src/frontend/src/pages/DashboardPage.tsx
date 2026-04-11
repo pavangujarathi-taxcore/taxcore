@@ -33,7 +33,7 @@ import {
   queueDueDateNotifications,
   refreshFromCanister,
   storage,
-} from "../data/storage";
+} from "../data/storage-api";
 import type { Client, User, WorkProcessing } from "../types";
 import { getTaxYears } from "../utils/taxYears";
 

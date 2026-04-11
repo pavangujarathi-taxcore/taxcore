@@ -33,7 +33,7 @@ import {
   onStorageChange,
   refreshFromCanister,
   storage,
-} from "../data/storage";
+} from "../data/storage-api";
 import { type Page, THEMES, type User } from "../types";
 import DeadlineBell from "./DeadlineBell";
 
