@@ -329,9 +329,18 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
     // Check immediately (in case storage was updated since checkingAdmin resolved)
     recheckAdmin();
 
-    // Also subscribe to any future storage changes (from 5-second background sync)
+    // Poll every 1 second for faster detection of Super Admin creation
+    const pollInterval = setInterval(() => {
+      refreshFromCanister().then(recheckAdmin).catch(() => {});
+    }, 1000);
+
+    // Also subscribe to any future storage changes
     const unsub = onStorageChange(recheckAdmin);
-    return unsub;
+    
+    return () => {
+      clearInterval(pollInterval);
+      unsub();
+    };
   }, [checkingAdmin, view]);
 
   // Countdown timer for OTP resend

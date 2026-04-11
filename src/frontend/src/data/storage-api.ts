@@ -245,6 +245,14 @@ export async function silentRefreshFromCanister(): Promise<void> {
       changed = true;
     }
 
+    // Sync superAdminCreated flag
+    const backendSuperAdminFlag = data.settings?.superAdminCreated || false;
+    if (cache.superAdminCreated !== backendSuperAdminFlag) {
+      cache.superAdminCreated = backendSuperAdminFlag;
+      localStorage.setItem(STORAGE_KEYS.superAdminCreated, backendSuperAdminFlag ? "true" : "false");
+      changed = true;
+    }
+
     if (changed) {
       lastSyncTime = new Date();
       dispatchChange("refresh");
@@ -273,6 +281,17 @@ export const storage = {
     cache.users = users;
     saveToLocalStorage(STORAGE_KEYS.users, users);
     dispatchChange(STORAGE_KEYS.users);
+    
+    // Auto-set superAdminCreated flag if a Super Admin exists
+    const hasSuperAdmin = users.some(u => u.role === "Super Admin");
+    if (hasSuperAdmin && !cache.superAdminCreated) {
+      cache.superAdminCreated = true;
+      localStorage.setItem(STORAGE_KEYS.superAdminCreated, "true");
+      // Sync flag to backend immediately
+      apiPost("/api/settings", { superAdminCreated: true }).catch(err => 
+        console.error("Failed to sync superAdminCreated flag:", err)
+      );
+    }
     
     // Sync to backend
     apiPost("/api/users", { users }).catch(err => 

@@ -111,7 +111,7 @@ export default function App() {
       });
   }, []);
 
-  // Auto-refresh from canister every 2 seconds when logged in (real-time sync)
+  // Auto-refresh from canister every 1 second when logged in (real-time sync)
   // biome-ignore lint/correctness/useExhaustiveDependencies: user.id is the stable identity key
   useEffect(() => {
     if (!user) return;
@@ -119,7 +119,7 @@ export default function App() {
     silentRefreshFromCanister().catch(() => {});
     const interval = setInterval(() => {
       silentRefreshFromCanister().catch(() => {});
-    }, 2_000); // Changed from 5s to 2s for near real-time sync
+    }, 1_000); // 1 second for real-time sync
     return () => clearInterval(interval);
   }, [user]);
 
