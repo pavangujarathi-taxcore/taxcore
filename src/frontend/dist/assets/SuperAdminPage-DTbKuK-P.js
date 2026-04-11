@@ -1,21 +1,10 @@
-import { d as createLucideIcon, a7 as useTheme, r as reactExports, s as storage, o as onStorageChange, j as jsxRuntimeExports, U as Users, a8 as Star, C as CircleCheckBig, I as Input, B as Button, b as Eye, L as Label, S as ShieldCheck, a9 as LayoutDashboard, D as Dialog, v as DialogContent, x as DialogHeader, y as DialogTitle, a5 as saveUsersNow, u as ue } from "./index-Ds9srQjX.js";
-import { B as Badge } from "./badge-BojeOMEh.js";
-import { S as Select, a as SelectTrigger, b as SelectValue, c as SelectContent, d as SelectItem } from "./select-g1N4ES4G.js";
-import { B as Building2 } from "./building-2-CgizNwVi.js";
-import { S as Search } from "./search-DK7OOpLO.js";
-import { P as Plus } from "./plus-D-QNtwKY.js";
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$2 = [
-  ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
-  ["path", { d: "M12 8v8", key: "napkw2" }],
-  ["path", { d: "m8 12 4 4 4-4", key: "k98ssh" }]
-];
-const CircleArrowDown = createLucideIcon("circle-arrow-down", __iconNode$2);
+import { d as createLucideIcon, a7 as useTheme, r as reactExports, s as storage, o as onStorageChange, j as jsxRuntimeExports, U as Users, a8 as Star, C as CircleCheckBig, I as Input, B as Button, b as Eye, L as Label, S as ShieldCheck, a9 as LayoutDashboard, D as Dialog, v as DialogContent, x as DialogHeader, y as DialogTitle, a4 as saveUsersNow, u as ue } from "./index-phMI_H9e.js";
+import { B as Badge } from "./badge-BuXsUrXu.js";
+import { S as Select, a as SelectTrigger, b as SelectValue, c as SelectContent, d as SelectItem } from "./select-Bt-e98o_.js";
+import { B as Building2 } from "./building-2-HRx6EmR-.js";
+import { S as Search } from "./search-BIU4l32S.js";
+import { P as Plus } from "./plus-B2tv0b3q.js";
+import { C as CircleX } from "./circle-x-DE2Vy_EL.js";
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -24,10 +13,10 @@ const CircleArrowDown = createLucideIcon("circle-arrow-down", __iconNode$2);
  */
 const __iconNode$1 = [
   ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
-  ["circle", { cx: "12", cy: "10", r: "3", key: "ilqhr7" }],
-  ["path", { d: "M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662", key: "154egf" }]
+  ["path", { d: "M12 8v8", key: "napkw2" }],
+  ["path", { d: "m8 12 4 4 4-4", key: "k98ssh" }]
 ];
-const CircleUser = createLucideIcon("circle-user", __iconNode$1);
+const CircleArrowDown = createLucideIcon("circle-arrow-down", __iconNode$1);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -36,10 +25,10 @@ const CircleUser = createLucideIcon("circle-user", __iconNode$1);
  */
 const __iconNode = [
   ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
-  ["path", { d: "m15 9-6 6", key: "1uzhvr" }],
-  ["path", { d: "m9 9 6 6", key: "z0biqf" }]
+  ["circle", { cx: "12", cy: "10", r: "3", key: "ilqhr7" }],
+  ["path", { d: "M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662", key: "154egf" }]
 ];
-const CircleX = createLucideIcon("circle-x", __iconNode);
+const CircleUser = createLucideIcon("circle-user", __iconNode);
 const ADMIN_PROFILE_COMPLETE_KEY = "taxcore_admin_profile_complete";
 function formatLastLogin(iso) {
   if (!iso) return "Never";

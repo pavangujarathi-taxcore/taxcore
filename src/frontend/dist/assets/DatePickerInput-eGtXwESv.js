@@ -1,5 +1,5 @@
-import { d as createLucideIcon, a3 as React, r as reactExports, j as jsxRuntimeExports, _ as cn, a4 as buttonVariants, B as Button$1, Y as useControllableState, Z as useId, F as useComposedRefs, K as Primitive, G as composeEventHandlers, P as Presence, A as Portal$1, J as hideOthers, O as ReactRemoveScroll, H as createContextScope, V as createSlot, N as useFocusGuards, Q as FocusScope, T as DismissableLayer, I as Input } from "./index-Ds9srQjX.js";
-import { i as ChevronDown, R as Root2$1, A as Anchor, e as createPopperScope, C as Content, g as Arrow, S as Select$1, a as SelectTrigger, b as SelectValue, c as SelectContent, d as SelectItem } from "./select-g1N4ES4G.js";
+import { d as createLucideIcon, a2 as React, r as reactExports, j as jsxRuntimeExports, Z as cn, a3 as buttonVariants, B as Button$1, z as composeRefs, W as useControllableState, Y as useId, G as useComposedRefs, M as Primitive, H as composeEventHandlers, P as Presence, F as Portal$1, K as hideOthers, Q as ReactRemoveScroll, J as createContextScope, O as useFocusGuards, T as FocusScope, V as DismissableLayer, I as Input } from "./index-phMI_H9e.js";
+import { i as ChevronDown, R as Root2$1, A as Anchor, e as createPopperScope, C as Content, g as Arrow, S as Select$1, a as SelectTrigger, b as SelectValue, c as SelectContent, d as SelectItem } from "./select-Bt-e98o_.js";
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -4291,6 +4291,89 @@ function CalendarDayButton({
     }
   );
 }
+// @__NO_SIDE_EFFECTS__
+function createSlot(ownerName) {
+  const SlotClone = /* @__PURE__ */ createSlotClone(ownerName);
+  const Slot2 = reactExports.forwardRef((props, forwardedRef) => {
+    const { children, ...slotProps } = props;
+    const childrenArray = reactExports.Children.toArray(children);
+    const slottable = childrenArray.find(isSlottable);
+    if (slottable) {
+      const newElement = slottable.props.children;
+      const newChildren = childrenArray.map((child) => {
+        if (child === slottable) {
+          if (reactExports.Children.count(newElement) > 1) return reactExports.Children.only(null);
+          return reactExports.isValidElement(newElement) ? newElement.props.children : null;
+        } else {
+          return child;
+        }
+      });
+      return /* @__PURE__ */ jsxRuntimeExports.jsx(SlotClone, { ...slotProps, ref: forwardedRef, children: reactExports.isValidElement(newElement) ? reactExports.cloneElement(newElement, void 0, newChildren) : null });
+    }
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(SlotClone, { ...slotProps, ref: forwardedRef, children });
+  });
+  Slot2.displayName = `${ownerName}.Slot`;
+  return Slot2;
+}
+// @__NO_SIDE_EFFECTS__
+function createSlotClone(ownerName) {
+  const SlotClone = reactExports.forwardRef((props, forwardedRef) => {
+    const { children, ...slotProps } = props;
+    if (reactExports.isValidElement(children)) {
+      const childrenRef = getElementRef(children);
+      const props2 = mergeProps(slotProps, children.props);
+      if (children.type !== reactExports.Fragment) {
+        props2.ref = forwardedRef ? composeRefs(forwardedRef, childrenRef) : childrenRef;
+      }
+      return reactExports.cloneElement(children, props2);
+    }
+    return reactExports.Children.count(children) > 1 ? reactExports.Children.only(null) : null;
+  });
+  SlotClone.displayName = `${ownerName}.SlotClone`;
+  return SlotClone;
+}
+var SLOTTABLE_IDENTIFIER = Symbol("radix.slottable");
+function isSlottable(child) {
+  return reactExports.isValidElement(child) && typeof child.type === "function" && "__radixId" in child.type && child.type.__radixId === SLOTTABLE_IDENTIFIER;
+}
+function mergeProps(slotProps, childProps) {
+  const overrideProps = { ...childProps };
+  for (const propName in childProps) {
+    const slotPropValue = slotProps[propName];
+    const childPropValue = childProps[propName];
+    const isHandler = /^on[A-Z]/.test(propName);
+    if (isHandler) {
+      if (slotPropValue && childPropValue) {
+        overrideProps[propName] = (...args) => {
+          const result = childPropValue(...args);
+          slotPropValue(...args);
+          return result;
+        };
+      } else if (slotPropValue) {
+        overrideProps[propName] = slotPropValue;
+      }
+    } else if (propName === "style") {
+      overrideProps[propName] = { ...slotPropValue, ...childPropValue };
+    } else if (propName === "className") {
+      overrideProps[propName] = [slotPropValue, childPropValue].filter(Boolean).join(" ");
+    }
+  }
+  return { ...slotProps, ...overrideProps };
+}
+function getElementRef(element) {
+  var _a, _b;
+  let getter = (_a = Object.getOwnPropertyDescriptor(element.props, "ref")) == null ? void 0 : _a.get;
+  let mayWarn = getter && "isReactWarning" in getter && getter.isReactWarning;
+  if (mayWarn) {
+    return element.ref;
+  }
+  getter = (_b = Object.getOwnPropertyDescriptor(element, "ref")) == null ? void 0 : _b.get;
+  mayWarn = getter && "isReactWarning" in getter && getter.isReactWarning;
+  if (mayWarn) {
+    return element.props.ref;
+  }
+  return element.props.ref || element.ref;
+}
 var POPOVER_NAME = "Popover";
 var [createPopoverContext] = createContextScope(POPOVER_NAME, [
   createPopperScope
@@ -4392,7 +4475,7 @@ var PopoverContent$1 = reactExports.forwardRef(
   }
 );
 PopoverContent$1.displayName = CONTENT_NAME;
-var Slot = createSlot("PopoverContent.RemoveScroll");
+var Slot = /* @__PURE__ */ createSlot("PopoverContent.RemoveScroll");
 var PopoverContentModal = reactExports.forwardRef(
   (props, forwardedRef) => {
     const context = usePopoverContext(CONTENT_NAME, props.__scopePopover);

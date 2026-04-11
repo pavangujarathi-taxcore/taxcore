@@ -1,4 +1,4 @@
-const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["assets/DashboardPage-D8sDPCqc.js","assets/card-WjwgtR0m.js","assets/select-g1N4ES4G.js","assets/InlineStatusCell-CjV47FHQ.js","assets/index-iEi2S07_.js","assets/taxYears-JUInSDi_.js","assets/ClientMasterPage-DqjBmyFU.js","assets/DatePickerInput-Dun0p4Us.js","assets/search-DK7OOpLO.js","assets/plus-D-QNtwKY.js","assets/pen-DZ2hzbCV.js","assets/trash-2-LhWuFRXR.js","assets/ClientDetailPage-XyyoDPN8.js","assets/building-2-CgizNwVi.js","assets/lock-DUDa4LV_.js","assets/save-DzpO_SUw.js","assets/WorkProcessingPage-DVOQSK86.js","assets/OutwardBillingPage-D5OeSjez.js","assets/UserManagementPage-DXytBsUU.js","assets/SuperAdminPage-D2LfO1oJ.js","assets/badge-BojeOMEh.js","assets/SettingsPage-BiyjqS1r.js"])))=>i.map(i=>d[i]);
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["assets/DashboardPage-CHljQMdh.js","assets/card-Bwsxiu5e.js","assets/select-Bt-e98o_.js","assets/InlineStatusCell-Crc9zniW.js","assets/index-XWxtUjhy.js","assets/taxYears-JUInSDi_.js","assets/ClientMasterPage-D6QFCl6G.js","assets/DatePickerInput-eGtXwESv.js","assets/search-BIU4l32S.js","assets/plus-B2tv0b3q.js","assets/pen-D0ePdY7w.js","assets/trash-2-CwvMY1q4.js","assets/ClientDetailPage-TyuPYLuK.js","assets/building-2-HRx6EmR-.js","assets/lock-B25TBX0G.js","assets/save-5OIzKpuR.js","assets/WorkProcessingPage-B1d1G_8Y.js","assets/OutwardBillingPage--Vz4BVYX.js","assets/UserManagementPage-K6NT4TjS.js","assets/ExportPage-DgKzpHq7.js","assets/file-spreadsheet-Cp8t9bWv.js","assets/ImportPage-D2wAb6w8.js","assets/circle-check-0H-17lng.js","assets/circle-x-DE2Vy_EL.js","assets/SuperAdminPage-DTbKuK-P.js","assets/badge-BuXsUrXu.js","assets/SettingsPage-BB4NOM4d.js"])))=>i.map(i=>d[i]);
 var __defProp = Object.defineProperty;
 var __typeError = (msg) => {
   throw TypeError(msg);
@@ -11907,7 +11907,7 @@ var Removable = (_e = class {
     );
   }
   clearGcTimeout() {
-    if (__privateGet(this, _gcTimeout)) {
+    if (__privateGet(this, _gcTimeout) !== void 0) {
       timeoutManager.clearTimeout(__privateGet(this, _gcTimeout));
       __privateSet(this, _gcTimeout, void 0);
     }
@@ -13647,7 +13647,7 @@ react_production.useSyncExternalStore = function(subscribe, getSnapshot, getServ
 react_production.useTransition = function() {
   return ReactSharedInternals$2.H.useTransition();
 };
-react_production.version = "19.1.5";
+react_production.version = "19.1.6";
 {
   react.exports = react_production;
 }
@@ -14986,7 +14986,7 @@ function mergeLoginOptions(loginOptions, otherLoginOptions) {
   };
 }
 const ONE_HOUR_IN_NANOSECONDS = BigInt(36e11);
-const DEFAULT_IDENTITY_PROVIDER = "https://id.ai";
+const DEFAULT_IDENTITY_PROVIDER = "https://identity.internetcomputer.org/";
 const InternetIdentityReactContext = reactExports.createContext(void 0);
 async function createAuthClient(createOptions) {
   const config = await loadConfig();
@@ -15526,7 +15526,7 @@ reactDom_production.useFormState = function(action, initialState, permalink) {
 reactDom_production.useFormStatus = function() {
   return ReactSharedInternals$1.H.useHostTransitionStatus();
 };
-reactDom_production.version = "19.1.5";
+reactDom_production.version = "19.1.6";
 function checkDCE$1() {
   if (typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ === "undefined" || typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.checkDCE !== "function") {
     return;
@@ -26507,12 +26507,12 @@ ReactDOMHydrationRoot.prototype.unstable_scheduleHydration = function(target) {
   }
 };
 var isomorphicReactPackageVersion$jscomp$inline_1785 = React.version;
-if ("19.1.5" !== isomorphicReactPackageVersion$jscomp$inline_1785)
+if ("19.1.6" !== isomorphicReactPackageVersion$jscomp$inline_1785)
   throw Error(
     formatProdErrorMessage(
       527,
       isomorphicReactPackageVersion$jscomp$inline_1785,
-      "19.1.5"
+      "19.1.6"
     )
   );
 ReactDOMSharedInternals.findDOMNode = function(componentOrElement) {
@@ -26530,10 +26530,10 @@ ReactDOMSharedInternals.findDOMNode = function(componentOrElement) {
 };
 var internals$jscomp$inline_2256 = {
   bundleType: 0,
-  version: "19.1.5",
+  version: "19.1.6",
   rendererPackageName: "react-dom",
   currentDispatcherRef: ReactSharedInternals,
-  reconcilerVersion: "19.1.5"
+  reconcilerVersion: "19.1.6"
 };
 if ("undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__) {
   var hook$jscomp$inline_2257 = __REACT_DEVTOOLS_GLOBAL_HOOK__;
@@ -26600,7 +26600,7 @@ reactDomClient_production.hydrateRoot = function(container, initialChildren, opt
   listenToAllSupportedEvents(container);
   return new ReactDOMHydrationRoot(initialChildren);
 };
-reactDomClient_production.version = "19.1.5";
+reactDomClient_production.version = "19.1.6";
 function checkDCE() {
   if (typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ === "undefined" || typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.checkDCE !== "function") {
     return;
@@ -27046,15 +27046,15 @@ function isLazyComponent(element) {
   return element != null && typeof element === "object" && "$$typeof" in element && element.$$typeof === REACT_LAZY_TYPE && "_payload" in element && isPromiseLike(element._payload);
 }
 // @__NO_SIDE_EFFECTS__
-function createSlot$1(ownerName) {
-  const SlotClone = /* @__PURE__ */ createSlotClone$1(ownerName);
+function createSlot$2(ownerName) {
+  const SlotClone = /* @__PURE__ */ createSlotClone$2(ownerName);
   const Slot2 = reactExports.forwardRef((props, forwardedRef) => {
     let { children, ...slotProps } = props;
     if (isLazyComponent(children) && typeof use === "function") {
       children = use(children._payload);
     }
     const childrenArray = reactExports.Children.toArray(children);
-    const slottable = childrenArray.find(isSlottable$1);
+    const slottable = childrenArray.find(isSlottable$2);
     if (slottable) {
       const newElement = slottable.props.children;
       const newChildren = childrenArray.map((child) => {
@@ -27072,17 +27072,17 @@ function createSlot$1(ownerName) {
   Slot2.displayName = `${ownerName}.Slot`;
   return Slot2;
 }
-var Slot$1 = /* @__PURE__ */ createSlot$1("Slot");
+var Slot$1 = /* @__PURE__ */ createSlot$2("Slot");
 // @__NO_SIDE_EFFECTS__
-function createSlotClone$1(ownerName) {
+function createSlotClone$2(ownerName) {
   const SlotClone = reactExports.forwardRef((props, forwardedRef) => {
     let { children, ...slotProps } = props;
     if (isLazyComponent(children) && typeof use === "function") {
       children = use(children._payload);
     }
     if (reactExports.isValidElement(children)) {
-      const childrenRef = getElementRef$2(children);
-      const props2 = mergeProps$1(slotProps, children.props);
+      const childrenRef = getElementRef$3(children);
+      const props2 = mergeProps$2(slotProps, children.props);
       if (children.type !== reactExports.Fragment) {
         props2.ref = forwardedRef ? composeRefs(forwardedRef, childrenRef) : childrenRef;
       }
@@ -27093,11 +27093,11 @@ function createSlotClone$1(ownerName) {
   SlotClone.displayName = `${ownerName}.SlotClone`;
   return SlotClone;
 }
-var SLOTTABLE_IDENTIFIER$1 = Symbol("radix.slottable");
-function isSlottable$1(child) {
-  return reactExports.isValidElement(child) && typeof child.type === "function" && "__radixId" in child.type && child.type.__radixId === SLOTTABLE_IDENTIFIER$1;
+var SLOTTABLE_IDENTIFIER$2 = Symbol("radix.slottable");
+function isSlottable$2(child) {
+  return reactExports.isValidElement(child) && typeof child.type === "function" && "__radixId" in child.type && child.type.__radixId === SLOTTABLE_IDENTIFIER$2;
 }
-function mergeProps$1(slotProps, childProps) {
+function mergeProps$2(slotProps, childProps) {
   const overrideProps = { ...childProps };
   for (const propName in childProps) {
     const slotPropValue = slotProps[propName];
@@ -27121,7 +27121,7 @@ function mergeProps$1(slotProps, childProps) {
   }
   return { ...slotProps, ...overrideProps };
 }
-function getElementRef$2(element) {
+function getElementRef$3(element) {
   var _a3, _b3;
   let getter = (_a3 = Object.getOwnPropertyDescriptor(element.props, "ref")) == null ? void 0 : _a3.get;
   let mayWarn = getter && "isReactWarning" in getter && getter.isReactWarning;
@@ -29853,12 +29853,12 @@ function isFunction(value) {
   return typeof value === "function";
 }
 // @__NO_SIDE_EFFECTS__
-function createSlot(ownerName) {
-  const SlotClone = /* @__PURE__ */ createSlotClone(ownerName);
+function createSlot$1(ownerName) {
+  const SlotClone = /* @__PURE__ */ createSlotClone$1(ownerName);
   const Slot2 = reactExports.forwardRef((props, forwardedRef) => {
     const { children, ...slotProps } = props;
     const childrenArray = reactExports.Children.toArray(children);
-    const slottable = childrenArray.find(isSlottable);
+    const slottable = childrenArray.find(isSlottable$1);
     if (slottable) {
       const newElement = slottable.props.children;
       const newChildren = childrenArray.map((child) => {
@@ -29877,12 +29877,12 @@ function createSlot(ownerName) {
   return Slot2;
 }
 // @__NO_SIDE_EFFECTS__
-function createSlotClone(ownerName) {
+function createSlotClone$1(ownerName) {
   const SlotClone = reactExports.forwardRef((props, forwardedRef) => {
     const { children, ...slotProps } = props;
     if (reactExports.isValidElement(children)) {
-      const childrenRef = getElementRef$1(children);
-      const props2 = mergeProps(slotProps, children.props);
+      const childrenRef = getElementRef$2(children);
+      const props2 = mergeProps$1(slotProps, children.props);
       if (children.type !== reactExports.Fragment) {
         props2.ref = forwardedRef ? composeRefs(forwardedRef, childrenRef) : childrenRef;
       }
@@ -29893,11 +29893,11 @@ function createSlotClone(ownerName) {
   SlotClone.displayName = `${ownerName}.SlotClone`;
   return SlotClone;
 }
-var SLOTTABLE_IDENTIFIER = Symbol("radix.slottable");
-function isSlottable(child) {
-  return reactExports.isValidElement(child) && typeof child.type === "function" && "__radixId" in child.type && child.type.__radixId === SLOTTABLE_IDENTIFIER;
+var SLOTTABLE_IDENTIFIER$1 = Symbol("radix.slottable");
+function isSlottable$1(child) {
+  return reactExports.isValidElement(child) && typeof child.type === "function" && "__radixId" in child.type && child.type.__radixId === SLOTTABLE_IDENTIFIER$1;
 }
-function mergeProps(slotProps, childProps) {
+function mergeProps$1(slotProps, childProps) {
   const overrideProps = { ...childProps };
   for (const propName in childProps) {
     const slotPropValue = slotProps[propName];
@@ -29921,7 +29921,7 @@ function mergeProps(slotProps, childProps) {
   }
   return { ...slotProps, ...overrideProps };
 }
-function getElementRef$1(element) {
+function getElementRef$2(element) {
   var _a3, _b3;
   let getter = (_a3 = Object.getOwnPropertyDescriptor(element.props, "ref")) == null ? void 0 : _a3.get;
   let mayWarn = getter && "isReactWarning" in getter && getter.isReactWarning;
@@ -29955,7 +29955,7 @@ var NODES$1 = [
   "ul"
 ];
 var Primitive$1 = NODES$1.reduce((primitive, node) => {
-  const Slot2 = /* @__PURE__ */ createSlot(`Primitive.${node}`);
+  const Slot2 = /* @__PURE__ */ createSlot$1(`Primitive.${node}`);
   const Node2 = reactExports.forwardRef((props, forwardedRef) => {
     const { asChild, ...primitiveProps } = props;
     const Comp = asChild ? Slot2 : node;
@@ -30413,7 +30413,7 @@ var Presence = (props) => {
   const { present, children } = props;
   const presence = usePresence(present);
   const child = typeof children === "function" ? children({ present: presence.isPresent }) : reactExports.Children.only(children);
-  const ref = useComposedRefs(presence.ref, getElementRef(child));
+  const ref = useComposedRefs(presence.ref, getElementRef$1(child));
   const forceMount = typeof children === "function";
   return forceMount || presence.isPresent ? reactExports.cloneElement(child, { ref }) : null;
 };
@@ -30512,7 +30512,7 @@ function usePresence(present) {
 function getAnimationName(styles) {
   return (styles == null ? void 0 : styles.animationName) || "none";
 }
-function getElementRef(element) {
+function getElementRef$1(element) {
   var _a3, _b3;
   let getter = (_a3 = Object.getOwnPropertyDescriptor(element.props, "ref")) == null ? void 0 : _a3.get;
   let mayWarn = getter && "isReactWarning" in getter && getter.isReactWarning;
@@ -31330,6 +31330,89 @@ var hideOthers = function(originalTarget, parentNode, markerName) {
   targets.push.apply(targets, Array.from(activeParentNode.querySelectorAll("[aria-live], script")));
   return applyAttributeToOthers(targets, activeParentNode, markerName, "aria-hidden");
 };
+// @__NO_SIDE_EFFECTS__
+function createSlot(ownerName) {
+  const SlotClone = /* @__PURE__ */ createSlotClone(ownerName);
+  const Slot2 = reactExports.forwardRef((props, forwardedRef) => {
+    const { children, ...slotProps } = props;
+    const childrenArray = reactExports.Children.toArray(children);
+    const slottable = childrenArray.find(isSlottable);
+    if (slottable) {
+      const newElement = slottable.props.children;
+      const newChildren = childrenArray.map((child) => {
+        if (child === slottable) {
+          if (reactExports.Children.count(newElement) > 1) return reactExports.Children.only(null);
+          return reactExports.isValidElement(newElement) ? newElement.props.children : null;
+        } else {
+          return child;
+        }
+      });
+      return /* @__PURE__ */ jsxRuntimeExports.jsx(SlotClone, { ...slotProps, ref: forwardedRef, children: reactExports.isValidElement(newElement) ? reactExports.cloneElement(newElement, void 0, newChildren) : null });
+    }
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(SlotClone, { ...slotProps, ref: forwardedRef, children });
+  });
+  Slot2.displayName = `${ownerName}.Slot`;
+  return Slot2;
+}
+// @__NO_SIDE_EFFECTS__
+function createSlotClone(ownerName) {
+  const SlotClone = reactExports.forwardRef((props, forwardedRef) => {
+    const { children, ...slotProps } = props;
+    if (reactExports.isValidElement(children)) {
+      const childrenRef = getElementRef(children);
+      const props2 = mergeProps(slotProps, children.props);
+      if (children.type !== reactExports.Fragment) {
+        props2.ref = forwardedRef ? composeRefs(forwardedRef, childrenRef) : childrenRef;
+      }
+      return reactExports.cloneElement(children, props2);
+    }
+    return reactExports.Children.count(children) > 1 ? reactExports.Children.only(null) : null;
+  });
+  SlotClone.displayName = `${ownerName}.SlotClone`;
+  return SlotClone;
+}
+var SLOTTABLE_IDENTIFIER = Symbol("radix.slottable");
+function isSlottable(child) {
+  return reactExports.isValidElement(child) && typeof child.type === "function" && "__radixId" in child.type && child.type.__radixId === SLOTTABLE_IDENTIFIER;
+}
+function mergeProps(slotProps, childProps) {
+  const overrideProps = { ...childProps };
+  for (const propName in childProps) {
+    const slotPropValue = slotProps[propName];
+    const childPropValue = childProps[propName];
+    const isHandler = /^on[A-Z]/.test(propName);
+    if (isHandler) {
+      if (slotPropValue && childPropValue) {
+        overrideProps[propName] = (...args) => {
+          const result = childPropValue(...args);
+          slotPropValue(...args);
+          return result;
+        };
+      } else if (slotPropValue) {
+        overrideProps[propName] = slotPropValue;
+      }
+    } else if (propName === "style") {
+      overrideProps[propName] = { ...slotPropValue, ...childPropValue };
+    } else if (propName === "className") {
+      overrideProps[propName] = [slotPropValue, childPropValue].filter(Boolean).join(" ");
+    }
+  }
+  return { ...slotProps, ...overrideProps };
+}
+function getElementRef(element) {
+  var _a3, _b3;
+  let getter = (_a3 = Object.getOwnPropertyDescriptor(element.props, "ref")) == null ? void 0 : _a3.get;
+  let mayWarn = getter && "isReactWarning" in getter && getter.isReactWarning;
+  if (mayWarn) {
+    return element.ref;
+  }
+  getter = (_b3 = Object.getOwnPropertyDescriptor(element, "ref")) == null ? void 0 : _b3.get;
+  mayWarn = getter && "isReactWarning" in getter && getter.isReactWarning;
+  if (mayWarn) {
+    return element.props.ref;
+  }
+  return element.props.ref || element.ref;
+}
 var DIALOG_NAME = "Dialog";
 var [createDialogContext] = createContextScope(DIALOG_NAME);
 var [DialogProvider, useDialogContext] = createDialogContext(DIALOG_NAME);
@@ -31739,7 +31822,7 @@ const createLucideIcon = (iconName, iconNode) => {
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$j = [
+const __iconNode$k = [
   ["path", { d: "M10.268 21a2 2 0 0 0 3.464 0", key: "vwvbt9" }],
   [
     "path",
@@ -31749,7 +31832,18 @@ const __iconNode$j = [
     }
   ]
 ];
-const Bell = createLucideIcon("bell", __iconNode$j);
+const Bell = createLucideIcon("bell", __iconNode$k);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$j = [
+  ["path", { d: "M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16", key: "jecpp" }],
+  ["rect", { width: "20", height: "14", x: "2", y: "6", rx: "2", key: "i6l2r4" }]
+];
+const Briefcase = createLucideIcon("briefcase", __iconNode$j);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -31757,10 +31851,10 @@ const Bell = createLucideIcon("bell", __iconNode$j);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$i = [
-  ["path", { d: "M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16", key: "jecpp" }],
-  ["rect", { width: "20", height: "14", x: "2", y: "6", rx: "2", key: "i6l2r4" }]
+  ["path", { d: "M21.801 10A10 10 0 1 1 17 3.335", key: "yps3ct" }],
+  ["path", { d: "m9 11 3 3L22 4", key: "1pflzl" }]
 ];
-const Briefcase = createLucideIcon("briefcase", __iconNode$i);
+const CircleCheckBig = createLucideIcon("circle-check-big", __iconNode$i);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -31768,17 +31862,6 @@ const Briefcase = createLucideIcon("briefcase", __iconNode$i);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$h = [
-  ["path", { d: "M21.801 10A10 10 0 1 1 17 3.335", key: "yps3ct" }],
-  ["path", { d: "m9 11 3 3L22 4", key: "1pflzl" }]
-];
-const CircleCheckBig = createLucideIcon("circle-check-big", __iconNode$h);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$g = [
   ["rect", { width: "8", height: "4", x: "8", y: "2", rx: "1", ry: "1", key: "tgr4d6" }],
   [
     "path",
@@ -31792,7 +31875,19 @@ const __iconNode$g = [
   ["path", { d: "M8 11h.01", key: "1dfujw" }],
   ["path", { d: "M8 16h.01", key: "18s6g9" }]
 ];
-const ClipboardList = createLucideIcon("clipboard-list", __iconNode$g);
+const ClipboardList = createLucideIcon("clipboard-list", __iconNode$h);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$g = [
+  ["path", { d: "M12 15V3", key: "m9g1x1" }],
+  ["path", { d: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4", key: "ih7n3h" }],
+  ["path", { d: "m7 10 5 5 5-5", key: "brsn70" }]
+];
+const Download = createLucideIcon("download", __iconNode$g);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -31800,18 +31895,6 @@ const ClipboardList = createLucideIcon("clipboard-list", __iconNode$g);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$f = [
-  ["path", { d: "M12 15V3", key: "m9g1x1" }],
-  ["path", { d: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4", key: "ih7n3h" }],
-  ["path", { d: "m7 10 5 5 5-5", key: "brsn70" }]
-];
-const Download = createLucideIcon("download", __iconNode$f);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$e = [
   [
     "path",
     {
@@ -31829,14 +31912,14 @@ const __iconNode$e = [
   ],
   ["path", { d: "m2 2 20 20", key: "1ooewy" }]
 ];
-const EyeOff = createLucideIcon("eye-off", __iconNode$e);
+const EyeOff = createLucideIcon("eye-off", __iconNode$f);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$d = [
+const __iconNode$e = [
   [
     "path",
     {
@@ -31846,7 +31929,20 @@ const __iconNode$d = [
   ],
   ["circle", { cx: "12", cy: "12", r: "3", key: "1v7zrd" }]
 ];
-const Eye = createLucideIcon("eye", __iconNode$d);
+const Eye = createLucideIcon("eye", __iconNode$e);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$d = [
+  ["rect", { width: "7", height: "9", x: "3", y: "3", rx: "1", key: "10lvy0" }],
+  ["rect", { width: "7", height: "5", x: "14", y: "3", rx: "1", key: "16une8" }],
+  ["rect", { width: "7", height: "9", x: "14", y: "12", rx: "1", key: "1hutg5" }],
+  ["rect", { width: "7", height: "5", x: "3", y: "16", rx: "1", key: "ldoo1y" }]
+];
+const LayoutDashboard = createLucideIcon("layout-dashboard", __iconNode$d);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -31854,12 +31950,11 @@ const Eye = createLucideIcon("eye", __iconNode$d);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$c = [
-  ["rect", { width: "7", height: "9", x: "3", y: "3", rx: "1", key: "10lvy0" }],
-  ["rect", { width: "7", height: "5", x: "14", y: "3", rx: "1", key: "16une8" }],
-  ["rect", { width: "7", height: "9", x: "14", y: "12", rx: "1", key: "1hutg5" }],
-  ["rect", { width: "7", height: "5", x: "3", y: "16", rx: "1", key: "ldoo1y" }]
+  ["path", { d: "m16 17 5-5-5-5", key: "1bji2h" }],
+  ["path", { d: "M21 12H9", key: "dn1m92" }],
+  ["path", { d: "M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4", key: "1uf3rs" }]
 ];
-const LayoutDashboard = createLucideIcon("layout-dashboard", __iconNode$c);
+const LogOut = createLucideIcon("log-out", __iconNode$c);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -31867,18 +31962,6 @@ const LayoutDashboard = createLucideIcon("layout-dashboard", __iconNode$c);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$b = [
-  ["path", { d: "m16 17 5-5-5-5", key: "1bji2h" }],
-  ["path", { d: "M21 12H9", key: "dn1m92" }],
-  ["path", { d: "M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4", key: "1uf3rs" }]
-];
-const LogOut = createLucideIcon("log-out", __iconNode$b);
-/**
- * @license lucide-react v0.511.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const __iconNode$a = [
   [
     "path",
     {
@@ -31888,14 +31971,14 @@ const __iconNode$a = [
   ],
   ["path", { d: "m15 5 4 4", key: "1mk7zo" }]
 ];
-const Pencil = createLucideIcon("pencil", __iconNode$a);
+const Pencil = createLucideIcon("pencil", __iconNode$b);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const __iconNode$9 = [
+const __iconNode$a = [
   [
     "path",
     { d: "M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z", key: "q3az6g" }
@@ -31903,7 +31986,20 @@ const __iconNode$9 = [
   ["path", { d: "M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8", key: "1h4pet" }],
   ["path", { d: "M12 17.5v-11", key: "1jc1ny" }]
 ];
-const Receipt = createLucideIcon("receipt", __iconNode$9);
+const Receipt = createLucideIcon("receipt", __iconNode$a);
+/**
+ * @license lucide-react v0.511.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+const __iconNode$9 = [
+  ["path", { d: "M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8", key: "v9h5vc" }],
+  ["path", { d: "M21 3v5h-5", key: "1q7to0" }],
+  ["path", { d: "M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16", key: "3uifl3" }],
+  ["path", { d: "M8 16H3v5", key: "1cv678" }]
+];
+const RefreshCw = createLucideIcon("refresh-cw", __iconNode$9);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -31911,12 +32007,16 @@ const Receipt = createLucideIcon("receipt", __iconNode$9);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$8 = [
-  ["path", { d: "M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8", key: "v9h5vc" }],
-  ["path", { d: "M21 3v5h-5", key: "1q7to0" }],
-  ["path", { d: "M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16", key: "3uifl3" }],
-  ["path", { d: "M8 16H3v5", key: "1cv678" }]
+  [
+    "path",
+    {
+      d: "M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z",
+      key: "1qme2f"
+    }
+  ],
+  ["circle", { cx: "12", cy: "12", r: "3", key: "1v7zrd" }]
 ];
-const RefreshCw = createLucideIcon("refresh-cw", __iconNode$8);
+const Settings = createLucideIcon("settings", __iconNode$8);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -31927,13 +32027,14 @@ const __iconNode$7 = [
   [
     "path",
     {
-      d: "M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z",
-      key: "1qme2f"
+      d: "M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z",
+      key: "oel41y"
     }
   ],
-  ["circle", { cx: "12", cy: "12", r: "3", key: "1v7zrd" }]
+  ["path", { d: "M12 8v4", key: "1got3b" }],
+  ["path", { d: "M12 16h.01", key: "1drbdi" }]
 ];
-const Settings = createLucideIcon("settings", __iconNode$7);
+const ShieldAlert = createLucideIcon("shield-alert", __iconNode$7);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -31948,10 +32049,9 @@ const __iconNode$6 = [
       key: "oel41y"
     }
   ],
-  ["path", { d: "M12 8v4", key: "1got3b" }],
-  ["path", { d: "M12 16h.01", key: "1drbdi" }]
+  ["path", { d: "m9 12 2 2 4-4", key: "dzmm74" }]
 ];
-const ShieldAlert = createLucideIcon("shield-alert", __iconNode$6);
+const ShieldCheck = createLucideIcon("shield-check", __iconNode$6);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -31965,10 +32065,9 @@ const __iconNode$5 = [
       d: "M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z",
       key: "oel41y"
     }
-  ],
-  ["path", { d: "m9 12 2 2 4-4", key: "dzmm74" }]
+  ]
 ];
-const ShieldCheck = createLucideIcon("shield-check", __iconNode$5);
+const Shield = createLucideIcon("shield", __iconNode$5);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -31979,12 +32078,12 @@ const __iconNode$4 = [
   [
     "path",
     {
-      d: "M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z",
-      key: "oel41y"
+      d: "M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z",
+      key: "r04s7s"
     }
   ]
 ];
-const Shield = createLucideIcon("shield", __iconNode$4);
+const Star = createLucideIcon("star", __iconNode$4);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -31992,15 +32091,11 @@ const Shield = createLucideIcon("shield", __iconNode$4);
  * See the LICENSE file in the root directory of this source tree.
  */
 const __iconNode$3 = [
-  [
-    "path",
-    {
-      d: "M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z",
-      key: "r04s7s"
-    }
-  ]
+  ["path", { d: "M12 3v12", key: "1x0j5s" }],
+  ["path", { d: "m17 8-5-5-5 5", key: "7q97r8" }],
+  ["path", { d: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4", key: "ih7n3h" }]
 ];
-const Star = createLucideIcon("star", __iconNode$3);
+const Upload = createLucideIcon("upload", __iconNode$3);
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -32165,7 +32260,7 @@ var NODES = [
   "ul"
 ];
 var Primitive = NODES.reduce((primitive, node) => {
-  const Slot2 = /* @__PURE__ */ createSlot$1(`Primitive.${node}`);
+  const Slot2 = /* @__PURE__ */ createSlot$2(`Primitive.${node}`);
   const Node2 = reactExports.forwardRef((props, forwardedRef) => {
     const { asChild, ...primitiveProps } = props;
     const Comp = asChild ? Slot2 : node;
@@ -32927,42 +33022,82 @@ const storage = {
   // ─── Clients ─────────────────────────────────────────────────────────────
   getClients: () => cache.clients,
   saveClients: (clients) => {
+    const isDelete = clients.length < cache.clients.length;
     cache.clients = clients;
     lsSet(KEYS.clients, clients);
     dispatchChange(KEYS.clients);
-    bgSync(async () => {
-      await saveAppData(buildAppDataSnapshot());
-    }, "saveClients");
+    if (isDelete) {
+      saveAppData(buildAppDataSnapshot()).then(() => console.log("[storage] Immediate delete sync successful")).catch((err) => {
+        console.error("[storage] Immediate delete sync failed:", err);
+        bgSync(async () => {
+          await saveAppData(buildAppDataSnapshot());
+        }, "saveClients");
+      });
+    } else {
+      bgSync(async () => {
+        await saveAppData(buildAppDataSnapshot());
+      }, "saveClients");
+    }
   },
   // ─── Documents ───────────────────────────────────────────────────────────
   getDocuments: () => cache.documents,
   saveDocuments: (docs) => {
+    const isDelete = docs.length < cache.documents.length;
     cache.documents = docs;
     lsSet(KEYS.documents, docs);
     dispatchChange(KEYS.documents);
-    bgSync(async () => {
-      await saveAppData(buildAppDataSnapshot());
-    }, "saveDocuments");
+    if (isDelete) {
+      saveAppData(buildAppDataSnapshot()).then(() => console.log("[storage] Immediate delete sync successful")).catch((err) => {
+        console.error("[storage] Immediate delete sync failed:", err);
+        bgSync(async () => {
+          await saveAppData(buildAppDataSnapshot());
+        }, "saveDocuments");
+      });
+    } else {
+      bgSync(async () => {
+        await saveAppData(buildAppDataSnapshot());
+      }, "saveDocuments");
+    }
   },
   // ─── Work Processing ─────────────────────────────────────────────────────
   getWork: () => cache.work,
   saveWork: (work) => {
+    const isDelete = work.length < cache.work.length;
     cache.work = work;
     lsSet(KEYS.work, work);
     dispatchChange(KEYS.work);
-    bgSync(async () => {
-      await saveAppData(buildAppDataSnapshot());
-    }, "saveWork");
+    if (isDelete) {
+      saveAppData(buildAppDataSnapshot()).then(() => console.log("[storage] Immediate delete sync successful")).catch((err) => {
+        console.error("[storage] Immediate delete sync failed:", err);
+        bgSync(async () => {
+          await saveAppData(buildAppDataSnapshot());
+        }, "saveWork");
+      });
+    } else {
+      bgSync(async () => {
+        await saveAppData(buildAppDataSnapshot());
+      }, "saveWork");
+    }
   },
   // ─── Billing ─────────────────────────────────────────────────────────────
   getBilling: () => cache.billing,
   saveBilling: (billing) => {
+    const isDelete = billing.length < cache.billing.length;
     cache.billing = billing;
     lsSet(KEYS.billing, billing);
     dispatchChange(KEYS.billing);
-    bgSync(async () => {
-      await saveAppData(buildAppDataSnapshot());
-    }, "saveBilling");
+    if (isDelete) {
+      saveAppData(buildAppDataSnapshot()).then(() => console.log("[storage] Immediate delete sync successful")).catch((err) => {
+        console.error("[storage] Immediate delete sync failed:", err);
+        bgSync(async () => {
+          await saveAppData(buildAppDataSnapshot());
+        }, "saveBilling");
+      });
+    } else {
+      bgSync(async () => {
+        await saveAppData(buildAppDataSnapshot());
+      }, "saveBilling");
+    }
   },
   // ─── Audit Logs ───────────────────────────────────────────────────────────
   getAuditLogs: () => cache.auditLogs,
@@ -33663,6 +33798,7 @@ const ownerNavItems = [
   },
   { id: "audit-log", label: "Audit Log", icon: ClipboardList, ownerOnly: true },
   { id: "export", label: "Export", icon: Download },
+  { id: "import", label: "Import", icon: Upload },
   {
     id: "settings",
     label: "Settings",
@@ -33679,6 +33815,7 @@ const pageTitles = {
   billing: "Outward & Billing",
   "user-management": "User Management",
   export: "Export Data",
+  import: "Import Data",
   "super-admin": "Administrator Panel",
   "audit-log": "Audit Log",
   settings: "Settings"
@@ -34276,17 +34413,18 @@ function Layout({
     )
   ] });
 }
-const LoginPage = reactExports.lazy(() => __vitePreload(() => import("./LoginPage-B90lHIww.js"), true ? [] : void 0));
-const DashboardPage = reactExports.lazy(() => __vitePreload(() => import("./DashboardPage-D8sDPCqc.js"), true ? __vite__mapDeps([0,1,2,3,4,5]) : void 0));
-const ClientMasterPage = reactExports.lazy(() => __vitePreload(() => import("./ClientMasterPage-DqjBmyFU.js"), true ? __vite__mapDeps([6,2,7,3,4,5,8,9,10,11]) : void 0));
-const ClientDetailPage = reactExports.lazy(() => __vitePreload(() => import("./ClientDetailPage-XyyoDPN8.js"), true ? __vite__mapDeps([12,2,4,7,13,9,11,14,15]) : void 0));
-const WorkProcessingPage = reactExports.lazy(() => __vitePreload(() => import("./WorkProcessingPage-DVOQSK86.js"), true ? __vite__mapDeps([16,2,7,5,8,14,10]) : void 0));
-const OutwardBillingPage = reactExports.lazy(() => __vitePreload(() => import("./OutwardBillingPage-D5OeSjez.js"), true ? __vite__mapDeps([17,2,8,15]) : void 0));
-const UserManagementPage = reactExports.lazy(() => __vitePreload(() => import("./UserManagementPage-DXytBsUU.js"), true ? __vite__mapDeps([18,9,11]) : void 0));
-const ExportPage = reactExports.lazy(() => __vitePreload(() => import("./ExportPage-bzHvg9td.js"), true ? [] : void 0));
-const SuperAdminPage = reactExports.lazy(() => __vitePreload(() => import("./SuperAdminPage-D2LfO1oJ.js"), true ? __vite__mapDeps([19,20,2,13,8,9]) : void 0));
-const AuditLogPage = reactExports.lazy(() => __vitePreload(() => import("./AuditLogPage-DnfLTmrg.js"), true ? [] : void 0));
-const SettingsPage = reactExports.lazy(() => __vitePreload(() => import("./SettingsPage-BiyjqS1r.js"), true ? __vite__mapDeps([21,20,1,2,11]) : void 0));
+const LoginPage = reactExports.lazy(() => __vitePreload(() => import("./LoginPage-CcfVjFqs.js"), true ? [] : void 0));
+const DashboardPage = reactExports.lazy(() => __vitePreload(() => import("./DashboardPage-CHljQMdh.js"), true ? __vite__mapDeps([0,1,2,3,4,5]) : void 0));
+const ClientMasterPage = reactExports.lazy(() => __vitePreload(() => import("./ClientMasterPage-D6QFCl6G.js"), true ? __vite__mapDeps([6,2,7,3,4,5,8,9,10,11]) : void 0));
+const ClientDetailPage = reactExports.lazy(() => __vitePreload(() => import("./ClientDetailPage-TyuPYLuK.js"), true ? __vite__mapDeps([12,2,4,7,13,9,11,14,15]) : void 0));
+const WorkProcessingPage = reactExports.lazy(() => __vitePreload(() => import("./WorkProcessingPage-B1d1G_8Y.js"), true ? __vite__mapDeps([16,2,7,5,8,14,10]) : void 0));
+const OutwardBillingPage = reactExports.lazy(() => __vitePreload(() => import("./OutwardBillingPage--Vz4BVYX.js"), true ? __vite__mapDeps([17,2,8,15]) : void 0));
+const UserManagementPage = reactExports.lazy(() => __vitePreload(() => import("./UserManagementPage-K6NT4TjS.js"), true ? __vite__mapDeps([18,9,11]) : void 0));
+const ExportPage = reactExports.lazy(() => __vitePreload(() => import("./ExportPage-DgKzpHq7.js"), true ? __vite__mapDeps([19,20]) : void 0));
+const ImportPage = reactExports.lazy(() => __vitePreload(() => import("./ImportPage-D2wAb6w8.js"), true ? __vite__mapDeps([21,20,22,23]) : void 0));
+const SuperAdminPage = reactExports.lazy(() => __vitePreload(() => import("./SuperAdminPage-DTbKuK-P.js"), true ? __vite__mapDeps([24,25,2,13,8,9,23]) : void 0));
+const AuditLogPage = reactExports.lazy(() => __vitePreload(() => import("./AuditLogPage-BuBJXbF9.js"), true ? [] : void 0));
+const SettingsPage = reactExports.lazy(() => __vitePreload(() => import("./SettingsPage-BB4NOM4d.js"), true ? __vite__mapDeps([26,25,1,2,22,11]) : void 0));
 function PageFallback() {
   return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center justify-center h-40", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-6 h-6 rounded-full border-2 border-[#6B1A2B] border-t-transparent animate-spin" }) });
 }
@@ -34368,7 +34506,7 @@ function App() {
     const interval = setInterval(() => {
       silentRefreshFromCanister().catch(() => {
       });
-    }, 5e3);
+    }, 2e3);
     return () => clearInterval(interval);
   }, [user]);
   reactExports.useEffect(() => {
@@ -34449,6 +34587,8 @@ function App() {
         return user.role === "Owner" ? /* @__PURE__ */ jsxRuntimeExports.jsx(UserManagementPage, {}) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-center py-10 text-gray-400", children: "Access denied. Owner only." });
       case "export":
         return /* @__PURE__ */ jsxRuntimeExports.jsx(ExportPage, {});
+      case "import":
+        return /* @__PURE__ */ jsxRuntimeExports.jsx(ImportPage, {});
       case "audit-log":
         return /* @__PURE__ */ jsxRuntimeExports.jsx(AuditLogPage, { user });
       case "settings":
@@ -34483,42 +34623,42 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   /* @__PURE__ */ jsxRuntimeExports.jsx(QueryClientProvider, { client: queryClient, children: /* @__PURE__ */ jsxRuntimeExports.jsx(InternetIdentityProvider, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(App, {}) }) })
 );
 export {
-  Pencil as $,
-  Portal$1 as A,
+  parseDDMMYYYY as $,
+  useCallbackRef$1 as A,
   Button as B,
   CircleCheckBig as C,
   Dialog as D,
   EyeOff as E,
-  useComposedRefs as F,
-  composeEventHandlers as G,
-  createContextScope as H,
+  Portal$1 as F,
+  useComposedRefs as G,
+  composeEventHandlers as H,
   Input as I,
-  hideOthers as J,
-  Primitive$1 as K,
+  createContextScope as J,
+  hideOthers as K,
   Label as L,
-  dispatchDiscreteCustomEvent as M,
-  useFocusGuards as N,
-  ReactRemoveScroll as O,
+  Primitive$1 as M,
+  dispatchDiscreteCustomEvent as N,
+  useFocusGuards as O,
   Presence as P,
-  FocusScope as Q,
+  ReactRemoveScroll as Q,
   RefreshCw as R,
   ShieldCheck as S,
-  DismissableLayer as T,
+  FocusScope as T,
   Users as U,
-  createSlot as V,
-  composeRefs as W,
+  DismissableLayer as V,
+  useControllableState as W,
   X,
-  useControllableState as Y,
-  useId as Z,
-  cn as _,
+  useId as Y,
+  cn as Z,
+  Pencil as _,
   refreshFromCanister as a,
-  parseDDMMYYYY as a0,
-  getHeadOfIncome$1 as a1,
-  getFilingStatus as a2,
-  React$2 as a3,
-  buttonVariants as a4,
-  saveUsersNow as a5,
-  Download as a6,
+  getHeadOfIncome$1 as a0,
+  getFilingStatus as a1,
+  React$2 as a2,
+  buttonVariants as a3,
+  saveUsersNow as a4,
+  Download as a5,
+  Upload as a6,
   useTheme as a7,
   Star as a8,
   LayoutDashboard as a9,
@@ -34551,5 +34691,5 @@ export {
   whenInitialized as w,
   DialogHeader as x,
   DialogTitle as y,
-  useCallbackRef$1 as z
+  composeRefs as z
 };

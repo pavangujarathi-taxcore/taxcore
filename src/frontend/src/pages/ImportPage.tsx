@@ -12,8 +12,8 @@ import {
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import * as XLSX from "xlsx";
-import { storage } from "../data/storage";
-import { getHeadOfIncome, getPanCategory } from "../types";
+import { storage, getPanCategory } from "../data/storage";
+import { getHeadOfIncome } from "../types";
 import type { Client } from "../types";
 
 type ImportStatus = "idle" | "validating" | "importing" | "success" | "error";

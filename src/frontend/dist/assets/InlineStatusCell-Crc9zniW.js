@@ -1,6 +1,6 @@
-import { d as createLucideIcon, r as reactExports, z as useCallbackRef, j as jsxRuntimeExports, P as Presence, A as Portal$1, F as useComposedRefs, G as composeEventHandlers, H as createContextScope, J as hideOthers, K as Primitive, M as dispatchDiscreteCustomEvent, N as useFocusGuards, O as ReactRemoveScroll, Q as FocusScope, T as DismissableLayer, V as createSlot, W as composeRefs, Y as useControllableState, Z as useId, _ as cn, $ as Pencil } from "./index-Ds9srQjX.js";
-import { u as useDirection, R as Root2$1, A as Anchor, e as createPopperScope, f as createCollection, C as Content, g as Arrow, h as Check } from "./select-g1N4ES4G.js";
-import { I as Item, c as createRovingFocusGroupScope, R as Root } from "./index-iEi2S07_.js";
+import { d as createLucideIcon, r as reactExports, j as jsxRuntimeExports, z as composeRefs, A as useCallbackRef, P as Presence, F as Portal$1, G as useComposedRefs, H as composeEventHandlers, J as createContextScope, K as hideOthers, M as Primitive, N as dispatchDiscreteCustomEvent, O as useFocusGuards, Q as ReactRemoveScroll, T as FocusScope, V as DismissableLayer, W as useControllableState, Y as useId, Z as cn, _ as Pencil } from "./index-phMI_H9e.js";
+import { u as useDirection, R as Root2$1, A as Anchor, e as createPopperScope, f as createCollection, C as Content, g as Arrow, h as Check } from "./select-Bt-e98o_.js";
+import { I as Item, c as createRovingFocusGroupScope, R as Root } from "./index-XWxtUjhy.js";
 /**
  * @license lucide-react v0.511.0 - ISC
  *
@@ -19,6 +19,89 @@ const __iconNode = [
   ["path", { d: "M12 17h.01", key: "p32p05" }]
 ];
 const TriangleAlert = createLucideIcon("triangle-alert", __iconNode);
+// @__NO_SIDE_EFFECTS__
+function createSlot(ownerName) {
+  const SlotClone = /* @__PURE__ */ createSlotClone(ownerName);
+  const Slot2 = reactExports.forwardRef((props, forwardedRef) => {
+    const { children, ...slotProps } = props;
+    const childrenArray = reactExports.Children.toArray(children);
+    const slottable = childrenArray.find(isSlottable);
+    if (slottable) {
+      const newElement = slottable.props.children;
+      const newChildren = childrenArray.map((child) => {
+        if (child === slottable) {
+          if (reactExports.Children.count(newElement) > 1) return reactExports.Children.only(null);
+          return reactExports.isValidElement(newElement) ? newElement.props.children : null;
+        } else {
+          return child;
+        }
+      });
+      return /* @__PURE__ */ jsxRuntimeExports.jsx(SlotClone, { ...slotProps, ref: forwardedRef, children: reactExports.isValidElement(newElement) ? reactExports.cloneElement(newElement, void 0, newChildren) : null });
+    }
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(SlotClone, { ...slotProps, ref: forwardedRef, children });
+  });
+  Slot2.displayName = `${ownerName}.Slot`;
+  return Slot2;
+}
+// @__NO_SIDE_EFFECTS__
+function createSlotClone(ownerName) {
+  const SlotClone = reactExports.forwardRef((props, forwardedRef) => {
+    const { children, ...slotProps } = props;
+    if (reactExports.isValidElement(children)) {
+      const childrenRef = getElementRef(children);
+      const props2 = mergeProps(slotProps, children.props);
+      if (children.type !== reactExports.Fragment) {
+        props2.ref = forwardedRef ? composeRefs(forwardedRef, childrenRef) : childrenRef;
+      }
+      return reactExports.cloneElement(children, props2);
+    }
+    return reactExports.Children.count(children) > 1 ? reactExports.Children.only(null) : null;
+  });
+  SlotClone.displayName = `${ownerName}.SlotClone`;
+  return SlotClone;
+}
+var SLOTTABLE_IDENTIFIER = Symbol("radix.slottable");
+function isSlottable(child) {
+  return reactExports.isValidElement(child) && typeof child.type === "function" && "__radixId" in child.type && child.type.__radixId === SLOTTABLE_IDENTIFIER;
+}
+function mergeProps(slotProps, childProps) {
+  const overrideProps = { ...childProps };
+  for (const propName in childProps) {
+    const slotPropValue = slotProps[propName];
+    const childPropValue = childProps[propName];
+    const isHandler = /^on[A-Z]/.test(propName);
+    if (isHandler) {
+      if (slotPropValue && childPropValue) {
+        overrideProps[propName] = (...args) => {
+          const result = childPropValue(...args);
+          slotPropValue(...args);
+          return result;
+        };
+      } else if (slotPropValue) {
+        overrideProps[propName] = slotPropValue;
+      }
+    } else if (propName === "style") {
+      overrideProps[propName] = { ...slotPropValue, ...childPropValue };
+    } else if (propName === "className") {
+      overrideProps[propName] = [slotPropValue, childPropValue].filter(Boolean).join(" ");
+    }
+  }
+  return { ...slotProps, ...overrideProps };
+}
+function getElementRef(element) {
+  var _a, _b;
+  let getter = (_a = Object.getOwnPropertyDescriptor(element.props, "ref")) == null ? void 0 : _a.get;
+  let mayWarn = getter && "isReactWarning" in getter && getter.isReactWarning;
+  if (mayWarn) {
+    return element.ref;
+  }
+  getter = (_b = Object.getOwnPropertyDescriptor(element, "ref")) == null ? void 0 : _b.get;
+  mayWarn = getter && "isReactWarning" in getter && getter.isReactWarning;
+  if (mayWarn) {
+    return element.props.ref;
+  }
+  return element.props.ref || element.ref;
+}
 var SELECTION_KEYS = ["Enter", " "];
 var FIRST_KEYS = ["ArrowDown", "PageUp", "Home"];
 var LAST_KEYS = ["ArrowUp", "PageDown", "End"];
@@ -157,7 +240,7 @@ var MenuRootContentNonModal = reactExports.forwardRef((props, forwardedRef) => {
     }
   );
 });
-var Slot = createSlot("MenuContent.ScrollLock");
+var Slot = /* @__PURE__ */ createSlot("MenuContent.ScrollLock");
 var MenuContentImpl = reactExports.forwardRef(
   (props, forwardedRef) => {
     const {
