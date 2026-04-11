@@ -374,6 +374,8 @@ export const storage = {
 
   getSuperAdminCreated: (): boolean => cache.superAdminCreated,
 
+  isSuperAdminCreated: (): boolean => cache.superAdminCreated, // Alias for backward compatibility
+
   setSuperAdminCreated: (created: boolean): void => {
     cache.superAdminCreated = created;
     localStorage.setItem(STORAGE_KEYS.superAdminCreated, created ? "true" : "false");
