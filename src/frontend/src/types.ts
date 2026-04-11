@@ -148,7 +148,7 @@ export function getHeadOfIncome(client: Client): string {
 }
 
 // Theme system
-export type ThemeKey = "burgundy" | "yellow" | "navy" | "forestgreen";
+export type ThemeKey = "burgundy" | "yellow" | "navy" | "forestgreen" | "teal" | "coral" | "mint" | "sky";
 
 export interface ThemeConfig {
   key: ThemeKey;
@@ -242,5 +242,70 @@ export const THEMES: Record<ThemeKey, ThemeConfig> = {
     avatarBg: "#4CAF7D",
     avatarText: "#FFFFFF",
     pageTitleColor: "#1A3A22",
+  },
+  // ✨ NEW FRESH & LIGHT THEMES
+  teal: {
+    key: "teal",
+    label: "Fresh Teal 💎",
+    primary: "#0D9488",
+    primaryLight: "rgba(13,148,136,0.08)",
+    gold: "#14B8A6",
+    activeHighlight: "rgba(20,184,166,0.15)",
+    subtitle: "#2DD4BF",
+    logoIconBg: "#14B8A6",
+    logoIconText: "#FFFFFF",
+    activeNavText: "#2DD4BF",
+    activeNavBorder: "#14B8A6",
+    avatarBg: "#14B8A6",
+    avatarText: "#FFFFFF",
+    pageTitleColor: "#0D9488",
+  },
+  coral: {
+    key: "coral",
+    label: "Coral Sunset 🌅",
+    primary: "#EA580C",
+    primaryLight: "rgba(234,88,12,0.08)",
+    gold: "#FB923C",
+    activeHighlight: "rgba(251,146,60,0.15)",
+    subtitle: "#FDBA74",
+    logoIconBg: "#FB923C",
+    logoIconText: "#FFFFFF",
+    activeNavText: "#FDBA74",
+    activeNavBorder: "#FB923C",
+    avatarBg: "#FB923C",
+    avatarText: "#FFFFFF",
+    pageTitleColor: "#EA580C",
+  },
+  mint: {
+    key: "mint",
+    label: "Mint Fresh 🌿",
+    primary: "#059669",
+    primaryLight: "rgba(5,150,105,0.08)",
+    gold: "#10B981",
+    activeHighlight: "rgba(16,185,129,0.15)",
+    subtitle: "#34D399",
+    logoIconBg: "#10B981",
+    logoIconText: "#FFFFFF",
+    activeNavText: "#34D399",
+    activeNavBorder: "#10B981",
+    avatarBg: "#10B981",
+    avatarText: "#FFFFFF",
+    pageTitleColor: "#059669",
+  },
+  sky: {
+    key: "sky",
+    label: "Sky Blue ☁️",
+    primary: "#0284C7",
+    primaryLight: "rgba(2,132,199,0.08)",
+    gold: "#0EA5E9",
+    activeHighlight: "rgba(14,165,233,0.15)",
+    subtitle: "#38BDF8",
+    logoIconBg: "#0EA5E9",
+    logoIconText: "#FFFFFF",
+    activeNavText: "#38BDF8",
+    activeNavBorder: "#0EA5E9",
+    avatarBg: "#0EA5E9",
+    avatarText: "#FFFFFF",
+    pageTitleColor: "#0284C7",
   },
 };

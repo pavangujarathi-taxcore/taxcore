@@ -20,11 +20,11 @@ function resolveThemeKey(raw: string | null): ThemeKey {
   if (raw === "violet") return "yellow";
   if (raw === "lightgreen") return "forestgreen";
   if (raw && VALID_KEYS.includes(raw as ThemeKey)) return raw as ThemeKey;
-  return "burgundy";
+  return "sky"; // Default to fresh Sky Blue theme
 }
 
 const ThemeContext = createContext<ThemeContextType>({
-  theme: THEMES.burgundy,
+  theme: THEMES.sky,
   setTheme: () => {},
 });
 
