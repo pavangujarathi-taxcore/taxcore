@@ -1,10 +1,11 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Union
 from datetime import datetime
 import os
 from pymongo import MongoClient
+from pymongo.collection import Collection
 from bson import ObjectId
 
 app = FastAPI(title="TaxCore API")
@@ -19,22 +20,23 @@ app.add_middleware(
 )
 
 # MongoDB Connection
-MONGO_URL = os.getenv("MONGO_URL", "mongodb://localhost:27017")
-client = MongoClient(MONGO_URL)
+MONGO_URL: str = os.getenv("MONGO_URL", "mongodb://localhost:27017")
+client: MongoClient = MongoClient(MONGO_URL)
 db = client.taxcore
 
 # Collections
-users_col = db.users
-clients_col = db.clients
-documents_col = db.documents
-work_col = db.work
-billing_col = db.billing
-firm_accounts_col = db.firm_accounts
-audit_logs_col = db.audit_logs
-settings_col = db.settings
+users_col: Collection = db.users
+clients_col: Collection = db.clients
+documents_col: Collection = db.documents
+work_col: Collection = db.work
+billing_col: Collection = db.billing
+firm_accounts_col: Collection = db.firm_accounts
+audit_logs_col: Collection = db.audit_logs
+settings_col: Collection = db.settings
 
 # Helper function to convert MongoDB _id to string
-def serialize_doc(doc):
+def serialize_doc(doc: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+    """Convert MongoDB _id to string for JSON serialization"""
     if doc and "_id" in doc:
         doc["_id"] = str(doc["_id"])
     return doc
@@ -124,23 +126,30 @@ class WhatsAppSettings(BaseModel):
 
 # Health Check
 @app.get("/")
-def read_root():
-    return {"status": "ok", "message": "TaxCore API is running", "timestamp": datetime.now().isoformat()}
+def read_root() -> Dict[str, str]:
+    """API health check endpoint"""
+    return {
+        "status": "ok",
+        "message": "TaxCore API is running",
+        "timestamp": datetime.now().isoformat()
+    }
 
 # =============================================================================
 # USERS API
 # =============================================================================
 
 @app.get("/api/users")
-def get_users():
-    users = list(users_col.find({}))
+def get_users() -> Dict[str, List[Dict[str, Any]]]:
+    """Get all users from database"""
+    users: List[Dict[str, Any]] = list(users_col.find({}))
     for user in users:
         serialize_doc(user)
     return {"users": users}
 
 @app.post("/api/users")
-def save_users(data: Dict[str, List[Dict]]):
-    users = data.get("users", [])
+def save_users(data: Dict[str, List[Dict[str, Any]]]) -> Dict[str, Union[bool, int]]:
+    """Save users to database"""
+    users: List[Dict[str, Any]] = data.get("users", [])
     if users:
         users_col.delete_many({})
         users_col.insert_many(users)
@@ -151,15 +160,17 @@ def save_users(data: Dict[str, List[Dict]]):
 # =============================================================================
 
 @app.get("/api/clients")
-def get_clients():
-    clients = list(clients_col.find({}))
+def get_clients() -> Dict[str, List[Dict[str, Any]]]:
+    """Get all clients from database"""
+    clients: List[Dict[str, Any]] = list(clients_col.find({}))
     for client in clients:
         serialize_doc(client)
     return {"clients": clients}
 
 @app.post("/api/clients")
-def save_clients(data: Dict[str, List[Dict]]):
-    clients = data.get("clients", [])
+def save_clients(data: Dict[str, List[Dict[str, Any]]]) -> Dict[str, Union[bool, int]]:
+    """Save clients to database"""
+    clients: List[Dict[str, Any]] = data.get("clients", [])
     if clients:
         clients_col.delete_many({})
         clients_col.insert_many(clients)
@@ -170,15 +181,17 @@ def save_clients(data: Dict[str, List[Dict]]):
 # =============================================================================
 
 @app.get("/api/documents")
-def get_documents():
-    documents = list(documents_col.find({}))
+def get_documents() -> Dict[str, List[Dict[str, Any]]]:
+    """Get all documents from database"""
+    documents: List[Dict[str, Any]] = list(documents_col.find({}))
     for doc in documents:
         serialize_doc(doc)
     return {"documents": documents}
 
 @app.post("/api/documents")
-def save_documents(data: Dict[str, List[Dict]]):
-    documents = data.get("documents", [])
+def save_documents(data: Dict[str, List[Dict[str, Any]]]) -> Dict[str, Union[bool, int]]:
+    """Save documents to database"""
+    documents: List[Dict[str, Any]] = data.get("documents", [])
     if documents:
         documents_col.delete_many({})
         documents_col.insert_many(documents)
@@ -189,15 +202,17 @@ def save_documents(data: Dict[str, List[Dict]]):
 # =============================================================================
 
 @app.get("/api/work")
-def get_work():
-    work = list(work_col.find({}))
+def get_work() -> Dict[str, List[Dict[str, Any]]]:
+    """Get all work processing records from database"""
+    work: List[Dict[str, Any]] = list(work_col.find({}))
     for w in work:
         serialize_doc(w)
     return {"work": work}
 
 @app.post("/api/work")
-def save_work(data: Dict[str, List[Dict]]):
-    work = data.get("work", [])
+def save_work(data: Dict[str, List[Dict[str, Any]]]) -> Dict[str, Union[bool, int]]:
+    """Save work processing records to database"""
+    work: List[Dict[str, Any]] = data.get("work", [])
     if work:
         work_col.delete_many({})
         work_col.insert_many(work)
@@ -208,15 +223,17 @@ def save_work(data: Dict[str, List[Dict]]):
 # =============================================================================
 
 @app.get("/api/billing")
-def get_billing():
-    billing = list(billing_col.find({}))
+def get_billing() -> Dict[str, List[Dict[str, Any]]]:
+    """Get all billing records from database"""
+    billing: List[Dict[str, Any]] = list(billing_col.find({}))
     for b in billing:
         serialize_doc(b)
     return {"billing": billing}
 
 @app.post("/api/billing")
-def save_billing(data: Dict[str, List[Dict]]):
-    billing = data.get("billing", [])
+def save_billing(data: Dict[str, List[Dict[str, Any]]]) -> Dict[str, Union[bool, int]]:
+    """Save billing records to database"""
+    billing: List[Dict[str, Any]] = data.get("billing", [])
     if billing:
         billing_col.delete_many({})
         billing_col.insert_many(billing)
@@ -227,15 +244,17 @@ def save_billing(data: Dict[str, List[Dict]]):
 # =============================================================================
 
 @app.get("/api/firm-accounts")
-def get_firm_accounts():
-    accounts = list(firm_accounts_col.find({}))
+def get_firm_accounts() -> Dict[str, List[Dict[str, Any]]]:
+    """Get all firm accounts from database"""
+    accounts: List[Dict[str, Any]] = list(firm_accounts_col.find({}))
     for acc in accounts:
         serialize_doc(acc)
     return {"firmAccounts": accounts}
 
 @app.post("/api/firm-accounts")
-def save_firm_accounts(data: Dict[str, List[Dict]]):
-    accounts = data.get("firmAccounts", [])
+def save_firm_accounts(data: Dict[str, List[Dict[str, Any]]]) -> Dict[str, Union[bool, int]]:
+    """Save firm accounts to database"""
+    accounts: List[Dict[str, Any]] = data.get("firmAccounts", [])
     if accounts:
         firm_accounts_col.delete_many({})
         firm_accounts_col.insert_many(accounts)
@@ -246,15 +265,17 @@ def save_firm_accounts(data: Dict[str, List[Dict]]):
 # =============================================================================
 
 @app.get("/api/audit-logs")
-def get_audit_logs():
-    logs = list(audit_logs_col.find({}))
+def get_audit_logs() -> Dict[str, List[Dict[str, Any]]]:
+    """Get all audit logs from database"""
+    logs: List[Dict[str, Any]] = list(audit_logs_col.find({}))
     for log in logs:
         serialize_doc(log)
     return {"auditLogs": logs}
 
 @app.post("/api/audit-logs")
-def save_audit_logs(data: Dict[str, List[Dict]]):
-    logs = data.get("auditLogs", [])
+def save_audit_logs(data: Dict[str, List[Dict[str, Any]]]) -> Dict[str, Union[bool, int]]:
+    """Save audit logs to database (append only)"""
+    logs: List[Dict[str, Any]] = data.get("auditLogs", [])
     if logs:
         # Don't delete existing logs, append only
         for log in logs:
@@ -267,8 +288,9 @@ def save_audit_logs(data: Dict[str, List[Dict]]):
 # =============================================================================
 
 @app.get("/api/settings")
-def get_settings():
-    settings = settings_col.find_one({"_id": "main"})
+def get_settings() -> Dict[str, Any]:
+    """Get application settings from database"""
+    settings: Optional[Dict[str, Any]] = settings_col.find_one({"_id": "main"})
     if settings:
         serialize_doc(settings)
         return settings
@@ -278,7 +300,8 @@ def get_settings():
     }
 
 @app.post("/api/settings")
-def save_settings(data: Dict[str, Any]):
+def save_settings(data: Dict[str, Any]) -> Dict[str, bool]:
+    """Save application settings to database"""
     data["_id"] = "main"
     settings_col.replace_one({"_id": "main"}, data, upsert=True)
     return {"success": True}
@@ -288,8 +311,8 @@ def save_settings(data: Dict[str, Any]):
 # =============================================================================
 
 @app.get("/api/sync/all")
-def sync_all():
-    """Get all data in one call - for initial load"""
+def sync_all() -> Dict[str, Any]:
+    """Get all data in one call - for initial load and real-time sync"""
     return {
         "users": [serialize_doc(u) for u in users_col.find({})],
         "clients": [serialize_doc(c) for c in clients_col.find({})],
@@ -298,7 +321,10 @@ def sync_all():
         "billing": [serialize_doc(b) for b in billing_col.find({})],
         "firmAccounts": [serialize_doc(f) for f in firm_accounts_col.find({})],
         "auditLogs": [serialize_doc(a) for a in audit_logs_col.find({})],
-        "settings": settings_col.find_one({"_id": "main"}) or {"superAdminCreated": False, "whatsAppSettings": None}
+        "settings": settings_col.find_one({"_id": "main"}) or {
+            "superAdminCreated": False,
+            "whatsAppSettings": None
+        }
     }
 
 # =============================================================================
@@ -306,9 +332,70 @@ def sync_all():
 # =============================================================================
 
 @app.get("/api/sync/timestamp")
-def get_last_sync():
+def get_last_sync() -> Dict[str, str]:
     """Returns server timestamp for sync verification"""
     return {"timestamp": datetime.now().isoformat()}
+
+# =============================================================================
+# EXPORT STATUS API
+# =============================================================================
+
+@app.get("/api/exports/status")
+def get_export_status() -> Dict[str, Any]:
+    """Get status of automated exports"""
+    import glob
+    
+    export_dir: str = "/app/exports"
+    if not os.path.exists(export_dir):
+        return {"enabled": True, "exports": 0, "latest": None}
+    
+    # Get all export files
+    export_files: List[str] = glob.glob(os.path.join(export_dir, "TaxCore_AutoExport_*.xlsx"))
+    export_files.sort(reverse=True)
+    
+    latest_export: Optional[Dict[str, Union[str, int]]] = None
+    if export_files:
+        latest_file: str = export_files[0]
+        file_stat = os.stat(latest_file)
+        latest_export = {
+            "filename": os.path.basename(latest_file),
+            "size": file_stat.st_size,
+            "created": datetime.fromtimestamp(file_stat.st_mtime).isoformat(),
+        }
+    
+    return {
+        "enabled": True,
+        "schedule": "Daily at 10:00 PM (22:00)",
+        "export_count": len(export_files),
+        "latest_export": latest_export,
+        "retention_days": 30,
+        "export_directory": export_dir,
+    }
+
+@app.get("/api/exports/list")
+def list_exports() -> Dict[str, Any]:
+    """List all available export files"""
+    import glob
+    
+    export_dir: str = "/app/exports"
+    if not os.path.exists(export_dir):
+        return {"exports": []}
+    
+    export_files: List[str] = glob.glob(os.path.join(export_dir, "TaxCore_AutoExport_*.xlsx"))
+    export_files.sort(reverse=True)
+    
+    exports: List[Dict[str, Union[str, int, float]]] = []
+    for filepath in export_files[:30]:  # Last 30 exports
+        file_stat = os.stat(filepath)
+        exports.append({
+            "filename": os.path.basename(filepath),
+            "size": file_stat.st_size,
+            "size_kb": round(file_stat.st_size / 1024, 2),
+            "created": datetime.fromtimestamp(file_stat.st_mtime).isoformat(),
+            "download_url": f"/api/exports/download/{os.path.basename(filepath)}",
+        })
+    
+    return {"exports": exports, "total": len(exports)}
 
 if __name__ == "__main__":
     import uvicorn
