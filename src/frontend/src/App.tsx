@@ -8,7 +8,7 @@ import {
   seedData,
   silentRefreshFromCanister,
   storage,
-} from "./data/storage";
+} from "./data/storage-api";
 import type { Client, Page, User } from "./types";
 
 // Lazy load all pages for faster initial load
