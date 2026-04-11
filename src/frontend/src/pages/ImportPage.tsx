@@ -1,13 +1,20 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { AlertCircle, CheckCircle2, Download, Upload, FileSpreadsheet, XCircle } from "lucide-react";
-import { useState, useRef } from "react";
+import {
+  AlertCircle,
+  CheckCircle2,
+  Download,
+  FileSpreadsheet,
+  Upload,
+  XCircle,
+} from "lucide-react";
+import { useRef, useState } from "react";
+import { toast } from "sonner";
 import * as XLSX from "xlsx";
 import { storage } from "../data/storage";
-import { getPanCategory, getHeadOfIncome } from "../types";
+import { getHeadOfIncome, getPanCategory } from "../types";
 import type { Client } from "../types";
-import { toast } from "sonner";
 
 type ImportStatus = "idle" | "validating" | "importing" | "success" | "error";
 
@@ -15,11 +22,14 @@ interface ValidationError {
   row: number;
   field: string;
   message: string;
+  id?: string; // Add unique ID for React keys
 }
 
 export default function ImportPage() {
   const [importStatus, setImportStatus] = useState<ImportStatus>("idle");
-  const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
+  const [validationErrors, setValidationErrors] = useState<ValidationError[]>(
+    [],
+  );
   const [importedCount, setImportedCount] = useState(0);
   const [duplicateCount, setDuplicateCount] = useState(0);
   const [file, setFile] = useState<File | null>(null);
@@ -57,7 +67,7 @@ export default function ImportPage() {
     const ws = XLSX.utils.json_to_sheet(template);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Client Template");
-    
+
     // Set column widths
     ws["!cols"] = [
       { wch: 20 }, // Name
@@ -71,7 +81,10 @@ export default function ImportPage() {
       { wch: 25 }, // Email
     ];
 
-    XLSX.writeFile(wb, `TaxCore_Import_Template_${new Date().toLocaleDateString("en-IN").replace(/\//g, "-")}.xlsx`);
+    XLSX.writeFile(
+      wb,
+      `TaxCore_Import_Template_${new Date().toLocaleDateString("en-IN").replace(/\//g, "-")}.xlsx`,
+    );
     toast.success("Template downloaded successfully!");
   };
 
@@ -87,46 +100,93 @@ export default function ImportPage() {
     } else {
       const pan = String(row.PAN).trim().toUpperCase();
       if (!/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(pan)) {
-        errors.push({ row: rowNum, field: "PAN", message: "Invalid PAN format (should be ABCPK1234F)" });
+        errors.push({
+          row: rowNum,
+          field: "PAN",
+          message: "Invalid PAN format (should be ABCPK1234F)",
+        });
       }
     }
     if (!row.Mobile || String(row.Mobile).trim() === "") {
-      errors.push({ row: rowNum, field: "Mobile", message: "Mobile is required" });
+      errors.push({
+        row: rowNum,
+        field: "Mobile",
+        message: "Mobile is required",
+      });
     } else {
       const mobile = String(row.Mobile).replace(/\D/g, "");
       if (mobile.length !== 10) {
-        errors.push({ row: rowNum, field: "Mobile", message: "Mobile must be 10 digits" });
+        errors.push({
+          row: rowNum,
+          field: "Mobile",
+          message: "Mobile must be 10 digits",
+        });
       }
     }
     if (!row["Tax Year"] || String(row["Tax Year"]).trim() === "") {
-      errors.push({ row: rowNum, field: "Tax Year", message: "Tax Year is required" });
+      errors.push({
+        row: rowNum,
+        field: "Tax Year",
+        message: "Tax Year is required",
+      });
     }
     if (!row["Due Date"] || String(row["Due Date"]).trim() === "") {
-      errors.push({ row: rowNum, field: "Due Date", message: "Due Date is required" });
+      errors.push({
+        row: rowNum,
+        field: "Due Date",
+        message: "Due Date is required",
+      });
     } else {
       const dueDateStr = String(row["Due Date"]).trim();
       if (!/^\d{2}-\d{2}-\d{4}$/.test(dueDateStr)) {
-        errors.push({ row: rowNum, field: "Due Date", message: "Due Date must be DD-MM-YYYY format" });
+        errors.push({
+          row: rowNum,
+          field: "Due Date",
+          message: "Due Date must be DD-MM-YYYY format",
+        });
       }
     }
 
     // Validate Head of Income
-    const validHeadOfIncome = ["Salaried", "Business", "Agricultural", "Capital Gain"];
-    if (row["Head of Income"] && !validHeadOfIncome.includes(String(row["Head of Income"]).trim())) {
-      errors.push({ row: rowNum, field: "Head of Income", message: `Must be one of: ${validHeadOfIncome.join(", ")}` });
+    const validHeadOfIncome = [
+      "Salaried",
+      "Business",
+      "Agricultural",
+      "Capital Gain",
+    ];
+    if (
+      row["Head of Income"] &&
+      !validHeadOfIncome.includes(String(row["Head of Income"]).trim())
+    ) {
+      errors.push({
+        row: rowNum,
+        field: "Head of Income",
+        message: `Must be one of: ${validHeadOfIncome.join(", ")}`,
+      });
     }
 
     // Validate Client Type
     const validClientTypes = ["Existing", "New"];
-    if (row["Client Type"] && !validClientTypes.includes(String(row["Client Type"]).trim())) {
-      errors.push({ row: rowNum, field: "Client Type", message: `Must be either: ${validClientTypes.join(", ")}` });
+    if (
+      row["Client Type"] &&
+      !validClientTypes.includes(String(row["Client Type"]).trim())
+    ) {
+      errors.push({
+        row: rowNum,
+        field: "Client Type",
+        message: `Must be either: ${validClientTypes.join(", ")}`,
+      });
     }
 
     // Validate Email if provided
     if (row.Email && String(row.Email).trim() !== "") {
       const email = String(row.Email).trim();
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        errors.push({ row: rowNum, field: "Email", message: "Invalid email format" });
+        errors.push({
+          row: rowNum,
+          field: "Email",
+          message: "Invalid email format",
+        });
       }
     }
 
@@ -170,13 +230,20 @@ export default function ImportPage() {
       const allErrors: ValidationError[] = [];
       jsonData.forEach((row, idx) => {
         const rowErrors = validateRow(row, idx + 2); // +2 because row 1 is header
-        allErrors.push(...rowErrors);
+        // Add unique IDs to errors for React keys
+        const errorsWithIds = rowErrors.map((err) => ({
+          ...err,
+          id: `${err.row}-${err.field}-${Math.random().toString(36).substr(2, 9)}`,
+        }));
+        allErrors.push(...errorsWithIds);
       });
 
       if (allErrors.length > 0) {
         setValidationErrors(allErrors);
         setImportStatus("error");
-        toast.error(`Found ${allErrors.length} validation errors. Please fix them and try again.`);
+        toast.error(
+          `Found ${allErrors.length} validation errors. Please fix them and try again.`,
+        );
         return;
       }
 
@@ -184,10 +251,12 @@ export default function ImportPage() {
       setImportStatus("importing");
 
       const existingClients = storage.getClients();
-      const existingPANs = new Set(existingClients.map(c => c.pan.toUpperCase()));
+      const existingPANs = new Set(
+        existingClients.map((c) => c.pan.toUpperCase()),
+      );
       const users = storage.getUsers();
       const currentUser = storage.getCurrentUser();
-      const ownerUser = users.find(u => u.role === "Owner") || currentUser;
+      const ownerUser = users.find((u) => u.role === "Owner") || currentUser;
 
       let imported = 0;
       let duplicates = 0;
@@ -196,7 +265,7 @@ export default function ImportPage() {
 
       for (const row of jsonData as any[]) {
         const pan = String(row.PAN).trim().toUpperCase();
-        
+
         // Check for duplicates
         if (existingPANs.has(pan)) {
           duplicates++;
@@ -211,7 +280,9 @@ export default function ImportPage() {
           email: row.Email ? String(row.Email).trim() : "",
           clientType: (row["Client Type"] || "Existing") as "Existing" | "New",
           headOfIncome: (row["Head of Income"] || "Salaried") as any,
-          businessName: row["Business Name"] ? String(row["Business Name"]).trim() : "",
+          businessName: row["Business Name"]
+            ? String(row["Business Name"]).trim()
+            : "",
           taxYear: String(row["Tax Year"]).trim(),
           dueDate: String(row["Due Date"]).trim(),
           clientCategory: getPanCategory(pan),
@@ -234,7 +305,7 @@ export default function ImportPage() {
       setDuplicateCount(duplicates);
       setImportStatus("success");
       toast.success(`Successfully imported ${imported} clients!`);
-      
+
       // Clear file input
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
@@ -284,12 +355,16 @@ export default function ImportPage() {
               >
                 1
               </span>
-              <h3 className="font-semibold text-sm" style={{ color: "#2563EB" }}>
+              <h3
+                className="font-semibold text-sm"
+                style={{ color: "#2563EB" }}
+              >
                 Download Template
               </h3>
             </div>
             <p className="text-xs text-gray-600 mb-3">
-              Download the Excel template with sample data and required column headers
+              Download the Excel template with sample data and required column
+              headers
             </p>
             <Button
               onClick={handleDownloadTemplate}
@@ -327,19 +402,36 @@ export default function ImportPage() {
               >
                 2
               </span>
-              <h3 className="font-semibold text-sm" style={{ color: "#D97706" }}>
+              <h3
+                className="font-semibold text-sm"
+                style={{ color: "#D97706" }}
+              >
                 Fill Template with Client Data
               </h3>
             </div>
             <p className="text-xs text-gray-600">
-              Open the template in Excel/Google Sheets and fill in your client details
+              Open the template in Excel/Google Sheets and fill in your client
+              details
             </p>
             <ul className="text-xs text-gray-500 mt-2 space-y-0.5 list-disc list-inside">
-              <li><strong>Required fields:</strong> Name, PAN, Mobile, Tax Year, Due Date</li>
-              <li><strong>PAN Format:</strong> ABCPK1234F (5 letters, 4 digits, 1 letter)</li>
-              <li><strong>Due Date Format:</strong> DD-MM-YYYY (e.g., 31-07-2025)</li>
-              <li><strong>Head of Income:</strong> Salaried, Business, Agricultural, or Capital Gain</li>
-              <li><strong>Client Type:</strong> Existing or New</li>
+              <li>
+                <strong>Required fields:</strong> Name, PAN, Mobile, Tax Year,
+                Due Date
+              </li>
+              <li>
+                <strong>PAN Format:</strong> ABCPK1234F (5 letters, 4 digits, 1
+                letter)
+              </li>
+              <li>
+                <strong>Due Date Format:</strong> DD-MM-YYYY (e.g., 31-07-2025)
+              </li>
+              <li>
+                <strong>Head of Income:</strong> Salaried, Business,
+                Agricultural, or Capital Gain
+              </li>
+              <li>
+                <strong>Client Type:</strong> Existing or New
+              </li>
             </ul>
           </div>
         </div>
@@ -368,7 +460,10 @@ export default function ImportPage() {
               >
                 3
               </span>
-              <h3 className="font-semibold text-sm" style={{ color: "#16A34A" }}>
+              <h3
+                className="font-semibold text-sm"
+                style={{ color: "#16A34A" }}
+              >
                 Upload & Import
               </h3>
             </div>
@@ -377,7 +472,10 @@ export default function ImportPage() {
             </p>
             <div className="space-y-3">
               <div>
-                <Label htmlFor="file-upload" className="text-xs font-medium text-gray-700">
+                <Label
+                  htmlFor="file-upload"
+                  className="text-xs font-medium text-gray-700"
+                >
                   Select Excel File
                 </Label>
                 <Input
@@ -397,19 +495,24 @@ export default function ImportPage() {
               </div>
               <Button
                 onClick={handleImport}
-                disabled={!file || importStatus === "validating" || importStatus === "importing"}
+                disabled={
+                  !file ||
+                  importStatus === "validating" ||
+                  importStatus === "importing"
+                }
                 className="text-white"
                 style={{ background: "#16A34A" }}
                 data-testid="import-submit-button"
               >
                 {importStatus === "validating" && "Validating..."}
                 {importStatus === "importing" && "Importing..."}
-                {importStatus !== "validating" && importStatus !== "importing" && (
-                  <>
-                    <Upload className="w-4 h-4 mr-1.5" />
-                    Import Clients
-                  </>
-                )}
+                {importStatus !== "validating" &&
+                  importStatus !== "importing" && (
+                    <>
+                      <Upload className="w-4 h-4 mr-1.5" />
+                      Import Clients
+                    </>
+                  )}
               </Button>
             </div>
           </div>
@@ -425,10 +528,13 @@ export default function ImportPage() {
         >
           <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
           <div>
-            <p className="font-semibold text-sm text-green-800">Import Successful!</p>
+            <p className="font-semibold text-sm text-green-800">
+              Import Successful!
+            </p>
             <p className="text-xs text-green-700 mt-0.5">
               {importedCount} clients imported successfully.
-              {duplicateCount > 0 && ` ${duplicateCount} duplicates were skipped (PAN already exists).`}
+              {duplicateCount > 0 &&
+                ` ${duplicateCount} duplicates were skipped (PAN already exists).`}
             </p>
           </div>
         </div>
@@ -444,18 +550,27 @@ export default function ImportPage() {
           <div className="flex items-start gap-3 mb-3">
             <XCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
             <div>
-              <p className="font-semibold text-sm text-red-800">Validation Errors Found</p>
+              <p className="font-semibold text-sm text-red-800">
+                Validation Errors Found
+              </p>
               <p className="text-xs text-red-700 mt-0.5">
-                Please fix the following errors in your Excel file and try again:
+                Please fix the following errors in your Excel file and try
+                again:
               </p>
             </div>
           </div>
           <div className="max-h-60 overflow-y-auto space-y-1.5">
-            {validationErrors.map((err, idx) => (
-              <div key={idx} className="text-xs text-red-700 bg-white rounded px-2 py-1.5 flex items-start gap-2">
+            {validationErrors.map((err) => (
+              <div
+                key={err.id || `${err.row}-${err.field}`}
+                className="text-xs text-red-700 bg-white rounded px-2 py-1.5 flex items-start gap-2"
+              >
                 <AlertCircle className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
                 <span>
-                  <strong>Row {err.row}, {err.field}:</strong> {err.message}
+                  <strong>
+                    Row {err.row}, {err.field}:
+                  </strong>{" "}
+                  {err.message}
                 </span>
               </div>
             ))}
@@ -474,7 +589,9 @@ export default function ImportPage() {
           <li>All validation must pass before import begins</li>
           <li>Excel files (.xlsx, .xls) are supported</li>
           <li>Maximum recommended: 500 clients per file</li>
-          <li>Imported clients will be assigned to the current owner account</li>
+          <li>
+            Imported clients will be assigned to the current owner account
+          </li>
         </ul>
       </div>
     </div>

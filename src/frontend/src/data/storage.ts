@@ -499,7 +499,7 @@ export const storage = {
     cache.clients = clients;
     lsSet(KEYS.clients, clients);
     dispatchChange(KEYS.clients);
-    
+
     // Use immediate save for delete operations to prevent reappearance bug
     if (isDelete) {
       saveAppData(buildAppDataSnapshot())
@@ -527,7 +527,7 @@ export const storage = {
     cache.documents = docs;
     lsSet(KEYS.documents, docs);
     dispatchChange(KEYS.documents);
-    
+
     if (isDelete) {
       saveAppData(buildAppDataSnapshot())
         .then(() => console.log("[storage] Immediate delete sync successful"))
@@ -553,7 +553,7 @@ export const storage = {
     cache.work = work;
     lsSet(KEYS.work, work);
     dispatchChange(KEYS.work);
-    
+
     if (isDelete) {
       saveAppData(buildAppDataSnapshot())
         .then(() => console.log("[storage] Immediate delete sync successful"))
@@ -579,7 +579,7 @@ export const storage = {
     cache.billing = billing;
     lsSet(KEYS.billing, billing);
     dispatchChange(KEYS.billing);
-    
+
     if (isDelete) {
       saveAppData(buildAppDataSnapshot())
         .then(() => console.log("[storage] Immediate delete sync successful"))
