@@ -1,0 +1,1162 @@
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  ArrowLeft,
+  Building2,
+  Lock,
+  Plus,
+  Save,
+  Trash2,
+  User,
+} from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import DatePickerInput from "../components/DatePickerInput";
+import { getPanCategory, parseDDMMYYYY, storage } from "../data/storage";
+import type { Client, DocumentInward, WorkProcessing } from "../types";
+import { getHeadOfIncome } from "../types";
+
+interface Props {
+  client: Client;
+  onBack: () => void;
+  onUpdateClient?: (updated: Client) => void;
+}
+
+// PAN type descriptions for Client Type tab
+const PAN_TYPE_INFO: Record<
+  string,
+  { label: string; description: string; icon: "person" | "building" }
+> = {
+  Individual: {
+    label: "Individual",
+    description: "Natural person filing personal income tax returns.",
+    icon: "person",
+  },
+  Company: {
+    label: "Company",
+    description: "Incorporated company registered under Companies Act.",
+    icon: "building",
+  },
+  Firm: {
+    label: "Firm",
+    description: "Partnership firm, LLP, or proprietary firm.",
+    icon: "building",
+  },
+  HUF: {
+    label: "HUF",
+    description: "Hindu Undivided Family — a unique Indian tax entity.",
+    icon: "person",
+  },
+  AOP: {
+    label: "AOP",
+    description: "Association of Persons — a group filing jointly.",
+    icon: "building",
+  },
+  BOI: {
+    label: "BOI",
+    description: "Body of Individuals — similar to AOP but for individuals.",
+    icon: "person",
+  },
+  Government: {
+    label: "Government",
+    description: "Central or state government entity.",
+    icon: "building",
+  },
+  AJP: {
+    label: "AJP",
+    description: "Artificial Juridical Person — entities recognized by law.",
+    icon: "building",
+  },
+  "Local Authority": {
+    label: "Local Authority",
+    description: "Municipal corporation, panchayat, or other local body.",
+    icon: "building",
+  },
+  Trust: {
+    label: "Trust",
+    description: "Charitable, religious, or other trust entity.",
+    icon: "building",
+  },
+  Other: {
+    label: "Other",
+    description: "Unknown or unrecognized PAN format.",
+    icon: "person",
+  },
+};
+
+const PAN_POSITIONS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] as const;
+function PanCharDisplay({ pan }: { pan: string }) {
+  const upper = pan.toUpperCase();
+  return (
+    <p className="font-mono text-sm tracking-widest text-gray-700 flex gap-0.5 flex-wrap">
+      {PAN_POSITIONS.map((pos) => {
+        const ch = upper.length > pos ? upper[pos] : "\u00a0";
+        return (
+          <span
+            key={pos}
+            className="inline-block w-6 text-center rounded"
+            style={
+              pos === 3
+                ? {
+                    background: "var(--theme-gold, #C9A44C)",
+                    color: "#fff",
+                    fontWeight: 700,
+                  }
+                : {
+                    background: "#f3f4f6",
+                  }
+            }
+          >
+            {ch}
+          </span>
+        );
+      })}
+    </p>
+  );
+}
+
+function ClientTypePanel({ pan }: { pan: string }) {
+  const panChar = pan && pan.length >= 4 ? pan[3].toUpperCase() : "";
+  const clientType = pan && pan.length >= 4 ? getPanCategory(pan) : "";
+  const info = clientType
+    ? (PAN_TYPE_INFO[clientType] ?? PAN_TYPE_INFO.Other)
+    : null;
+  const isPerson = info?.icon === "person";
+
+  if (!pan || pan.length < 4) {
+    return (
+      <div className="bg-white rounded-lg border p-6 max-w-lg">
+        <div className="flex flex-col items-center justify-center gap-3 text-center py-4">
+          <div
+            className="w-14 h-14 rounded-full flex items-center justify-center"
+            style={{
+              background: "var(--theme-primary-light, rgba(107,26,43,0.08))",
+            }}
+          >
+            <User
+              className="w-7 h-7"
+              style={{ color: "var(--theme-primary, #6B1A2B)" }}
+            />
+          </div>
+          <p className="font-semibold text-gray-700">PAN not entered</p>
+          <p className="text-sm text-gray-400">
+            Client Type cannot be determined until a valid PAN number is saved.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-lg space-y-3">
+      <div
+        className="rounded-xl border p-5"
+        style={{
+          background: "var(--theme-primary-light, rgba(107,26,43,0.05))",
+          borderColor: "var(--theme-primary-light, rgba(107,26,43,0.2))",
+        }}
+      >
+        <p
+          className="text-xs font-semibold uppercase tracking-widest mb-3"
+          style={{ color: "var(--theme-primary, #6B1A2B)", opacity: 0.7 }}
+        >
+          Income Tax Client Type
+        </p>
+        <div className="flex items-center gap-4">
+          <div
+            className="w-16 h-16 rounded-full flex items-center justify-center flex-shrink-0"
+            style={{ background: "var(--theme-primary, #6B1A2B)" }}
+          >
+            {isPerson ? (
+              <User className="w-8 h-8 text-white" />
+            ) : (
+              <Building2 className="w-8 h-8 text-white" />
+            )}
+          </div>
+          <div className="min-w-0">
+            <h3
+              className="text-2xl font-bold leading-tight"
+              style={{ color: "var(--theme-primary, #6B1A2B)" }}
+            >
+              {info?.label ?? clientType}
+            </h3>
+            <p className="text-sm text-gray-600 mt-1 leading-snug">
+              {info?.description}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="rounded-lg border bg-white p-4 flex items-center gap-3">
+        <div
+          className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 font-mono font-bold text-lg"
+          style={{
+            background: "var(--theme-gold, #C9A44C)",
+            color: "#fff",
+          }}
+        >
+          {panChar}
+        </div>
+        <div className="min-w-0">
+          <p className="text-xs text-gray-500">Based on PAN 4th character</p>
+          <p className="text-sm font-semibold text-gray-800">
+            Character <span className="font-mono">&quot;{panChar}&quot;</span> →{" "}
+            <span style={{ color: "var(--theme-primary, #6B1A2B)" }}>
+              {info?.label ?? clientType}
+            </span>
+          </p>
+        </div>
+      </div>
+
+      <div className="rounded-lg border bg-white p-3">
+        <p className="text-xs text-gray-400 mb-2 font-medium">PAN Number</p>
+        <PanCharDisplay pan={pan} />
+        <p className="text-xs text-gray-400 mt-1.5">
+          4th character highlighted
+        </p>
+      </div>
+    </div>
+  );
+}
+
+export default function ClientDetailPage({
+  client,
+  onBack,
+  onUpdateClient,
+}: Props) {
+  const currentUser = storage.getCurrentUser();
+  const [docForm, setDocForm] = useState({
+    date: "",
+    mode: "Email" as DocumentInward["mode"],
+    status: "Complete" as DocumentInward["status"],
+    remarks: "",
+  });
+  const [docError, setDocError] = useState("");
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const [workForm, setWorkForm] = useState<Partial<WorkProcessing>>({
+    filingStatus: "Pending",
+    returnType: "Original",
+    remark: "",
+  });
+  const [filingDateLocked, setFilingDateLocked] = useState(false);
+  const [workError, setWorkError] = useState("");
+  const [ackError, setAckError] = useState("");
+  const [workSaved, setWorkSaved] = useState(false);
+  const [dueDate, setDueDate] = useState(client.dueDate || "");
+  const workInitialized = useRef(false);
+
+  const docs = useMemo(() => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    refreshKey;
+    return storage
+      .getDocuments()
+      .filter((d) => d.clientId === client.id)
+      .sort((a, b) => {
+        const da = parseDDMMYYYY(a.date)?.getTime() || 0;
+        const db = parseDDMMYYYY(b.date)?.getTime() || 0;
+        return db - da;
+      });
+  }, [client.id, refreshKey]);
+
+  const work = useMemo(() => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    refreshKey;
+    return storage.getWork().find((w) => w.clientId === client.id) || null;
+  }, [client.id, refreshKey]);
+
+  // Initialize workForm from work -- only once per client load
+  useEffect(() => {
+    if (work && !workInitialized.current) {
+      workInitialized.current = true;
+      const hasValidAck = !!(work.ackNumber && /^\d{15}$/.test(work.ackNumber));
+      // Normalize filing status: if no valid ack number, status MUST always be "Pending" — no exceptions
+      let fs = work.filingStatus ?? (work.eVerified ? "E-Verified" : "Pending");
+      if (!hasValidAck) {
+        // Rule 1 + Rule 5: no valid ack = always "Pending", even if stored as E-Verified
+        fs = "Pending";
+      }
+      // Normalize filing date: if no valid ack number, clear the filing date
+      const filingDate = hasValidAck ? work.filingDate || "" : "";
+      setWorkForm({
+        status: work.status,
+        itrForm: work.itrForm,
+        returnType: work.returnType || "Original",
+        remark: work.remark || "",
+        ackNumber: work.ackNumber,
+        filingDate: filingDate,
+        filingStatus: fs as WorkProcessing["filingStatus"],
+      });
+      if (hasValidAck) {
+        setFilingDateLocked(true);
+      }
+    }
+  }, [work]);
+
+  const validateDate = (d: string): boolean => {
+    if (!d) return false;
+    const parts = d.split("-");
+    if (parts.length !== 3) return false;
+    const [dd, mm, yyyy] = parts;
+    const dt = new Date(Number(yyyy), Number(mm) - 1, Number(dd));
+    return !Number.isNaN(dt.getTime()) && dt.getFullYear() === Number(yyyy);
+  };
+
+  const isDateInFuture = (d: string): boolean => {
+    const dt = parseDDMMYYYY(d);
+    if (!dt) return false;
+    return dt > new Date();
+  };
+
+  const deriveFilingDateFromAck = (digits: string): string | null => {
+    if (digits.length !== 15) return null;
+    const last6 = digits.slice(9, 15);
+    const dd = last6.slice(0, 2);
+    const mm = last6.slice(2, 4);
+    const yy = last6.slice(4, 6);
+    const yyyy = `20${yy}`;
+    const dayNum = Number(dd);
+    const monthNum = Number(mm);
+    const yearNum = Number(yyyy);
+    if (
+      dayNum < 1 ||
+      dayNum > 31 ||
+      monthNum < 1 ||
+      monthNum > 12 ||
+      yearNum < 2000 ||
+      yearNum > 2099
+    ) {
+      return null;
+    }
+    const dt = new Date(yearNum, monthNum - 1, dayNum);
+    if (
+      dt.getFullYear() !== yearNum ||
+      dt.getMonth() !== monthNum - 1 ||
+      dt.getDate() !== dayNum
+    ) {
+      return null;
+    }
+    return `${dd}-${mm}-${yyyy}`;
+  };
+
+  const handleAckNumberChange = (raw: string) => {
+    const digits = raw.replace(/\D/g, "").slice(0, 15);
+    setAckError(""); // clear previous error
+
+    if (digits.length === 15) {
+      const derived = deriveFilingDateFromAck(digits);
+      if (derived) {
+        // Validate: filing date must be after 31 March of tax year end year
+        const tyParts = client.taxYear?.split("-");
+        let isAfterYearEnd = true;
+        let endYear = 0;
+        if (tyParts && tyParts.length === 2) {
+          endYear = Number(tyParts[1]);
+          const taxYearEndDate = new Date(endYear, 2, 31); // 31 March
+          taxYearEndDate.setHours(0, 0, 0, 0);
+          const fdParts = derived.split("-");
+          if (fdParts.length === 3) {
+            const filingDt = new Date(
+              Number(fdParts[2]),
+              Number(fdParts[1]) - 1,
+              Number(fdParts[0]),
+            );
+            filingDt.setHours(0, 0, 0, 0);
+            if (filingDt <= taxYearEndDate) {
+              isAfterYearEnd = false;
+            }
+          }
+        }
+
+        if (!isAfterYearEnd) {
+          // Derived date is invalid (on/before 31 March) — show error, reset to Pending
+          // Rule 3 + Rule 5: invalid ack = status MUST be "Pending", no exceptions
+          setAckError(
+            `Filing Date ${derived} derived from Ack No must be after 31-03-${endYear} (Tax Year ${client.taxYear}). Please check the Acknowledgement Number.`,
+          );
+          setWorkForm((f) => ({
+            ...f,
+            ackNumber: digits,
+            filingDate: "",
+            filingStatus: "Pending",
+          }));
+          setFilingDateLocked(false);
+          return;
+        }
+
+        // Valid date after year end — auto-fill and upgrade
+        setWorkForm((f) => ({
+          ...f,
+          ackNumber: digits,
+          filingDate: derived,
+          filingStatus:
+            f.filingStatus === "E-Verified"
+              ? "E-Verified"
+              : "Pending for E-verification",
+        }));
+        setFilingDateLocked(true);
+        return;
+      }
+    }
+
+    // Ack cleared or incomplete — reset filing date and status to Pending (Rule 3 + Rule 5)
+    // No valid ack = ALWAYS "Pending", even if previously E-Verified
+    setWorkForm((f) => ({
+      ...f,
+      ackNumber: digits,
+      filingDate: "",
+      filingStatus: "Pending",
+    }));
+    setFilingDateLocked(false);
+  };
+
+  const handleAddDoc = () => {
+    setDocError("");
+    if (!docForm.date) return setDocError("Date is required.");
+    if (!validateDate(docForm.date))
+      return setDocError("Date must be DD-MM-YYYY format.");
+    if (isDateInFuture(docForm.date))
+      return setDocError("Date cannot be in the future.");
+
+    const newDoc: DocumentInward = {
+      id: storage.uid(),
+      clientId: client.id,
+      date: docForm.date,
+      mode: docForm.mode,
+      status: docForm.status,
+      remarks: docForm.remarks,
+      createdAt: new Date().toISOString(),
+    };
+    storage.saveDocuments([...storage.getDocuments(), newDoc]);
+    setDocForm({ date: "", mode: "Email", status: "Complete", remarks: "" });
+    setRefreshKey((k) => k + 1);
+  };
+
+  const handleDeleteDoc = (id: string) => {
+    storage.saveDocuments(storage.getDocuments().filter((d) => d.id !== id));
+    setRefreshKey((k) => k + 1);
+  };
+
+  const handleSaveWork = () => {
+    setWorkError("");
+    setAckError("");
+    if (workForm.ackNumber && !/^\d{15}$/.test(workForm.ackNumber))
+      return setWorkError(
+        "Acknowledgement Number must be exactly 15 numeric digits.",
+      );
+
+    // Rule 6 — Save-time safety net: if no valid ack, filing status MUST be "Pending"
+    const hasValidAck = !!(
+      workForm.ackNumber && /^\d{15}$/.test(workForm.ackNumber)
+    );
+    if (
+      !hasValidAck &&
+      workForm.filingStatus &&
+      workForm.filingStatus !== "Pending"
+    ) {
+      return setWorkError(
+        'Filing Status can only be "Pending for E-verification" or "E-Verified" when a valid 15-digit Acknowledgement Number is entered.',
+      );
+    }
+    // Validate Due Date
+    if (dueDate) {
+      if (!validateDate(dueDate))
+        return setWorkError("Due Date must be in DD-MM-YYYY format.");
+      if (client.taxYear) {
+        const tyParts = client.taxYear.split("-");
+        if (tyParts.length === 2) {
+          const endYear = Number(tyParts[1]);
+          const taxYearEnd = new Date(endYear, 2, 31);
+          taxYearEnd.setHours(0, 0, 0, 0);
+          const dueParts = dueDate.split("-");
+          if (dueParts.length === 3) {
+            const dueDt = new Date(
+              Number(dueParts[2]),
+              Number(dueParts[1]) - 1,
+              Number(dueParts[0]),
+            );
+            dueDt.setHours(0, 0, 0, 0);
+            if (dueDt <= taxYearEnd)
+              return setWorkError(
+                `Due Date must be after 31-03-${endYear} (end of Tax Year ${client.taxYear}).`,
+              );
+          }
+        }
+      }
+    }
+    // Filing date is auto-derived from ack number (locked field) — only validate format, not future date
+    if (workForm.filingDate) {
+      if (!validateDate(workForm.filingDate))
+        return setWorkError("Filing Date must be DD-MM-YYYY format.");
+      // Validate: Filing Date must be after the tax year end date (31st March of end year)
+      const tyParts = client.taxYear?.split("-");
+      if (tyParts && tyParts.length === 2) {
+        const endYear = Number(tyParts[1]);
+        const taxYearEndDate = new Date(endYear, 2, 31); // 31 March of end year
+        taxYearEndDate.setHours(0, 0, 0, 0);
+        const fdParts = workForm.filingDate.split("-");
+        if (fdParts.length === 3) {
+          const filingDt = new Date(
+            Number(fdParts[2]),
+            Number(fdParts[1]) - 1,
+            Number(fdParts[0]),
+          );
+          filingDt.setHours(0, 0, 0, 0);
+          if (filingDt <= taxYearEndDate) {
+            return setWorkError(
+              `Filing Date must be after 31-03-${endYear} (end of Tax Year ${client.taxYear}).`,
+            );
+          }
+        }
+      }
+    }
+
+    const allWork = storage.getWork();
+    const filingStatus = workForm.filingStatus || "Pending";
+    const eVerified = filingStatus === "E-Verified";
+
+    if (work) {
+      const updated: WorkProcessing = {
+        ...work,
+        status: (workForm.status || work.status) as WorkProcessing["status"],
+        itrForm: workForm.itrForm || "",
+        returnType: workForm.returnType || "Original",
+        remark: workForm.remark || "",
+        ackNumber: workForm.ackNumber || "",
+        filingDate: workForm.filingDate || "",
+        filingStatus,
+        eVerified,
+        updatedAt: new Date().toISOString(),
+      };
+      storage.saveWork(allWork.map((w) => (w.id === work.id ? updated : w)));
+    } else {
+      const wp: WorkProcessing = {
+        id: storage.uid(),
+        clientId: client.id,
+        taxYear: client.taxYear,
+        status: (workForm.status || "Pending") as WorkProcessing["status"],
+        itrForm: workForm.itrForm || "",
+        returnType: workForm.returnType || "Original",
+        remark: workForm.remark || "",
+        ackNumber: workForm.ackNumber || "",
+        filingDate: workForm.filingDate || "",
+        filingStatus,
+        eVerified,
+        updatedAt: new Date().toISOString(),
+      };
+      storage.saveWork([...allWork, wp]);
+    }
+    // Also update Due Date on the client record if it changed
+    if (dueDate !== client.dueDate) {
+      const allClients = storage.getClients();
+      const updatedClient: Client = { ...client, dueDate };
+      storage.saveClients(
+        allClients.map((c) => (c.id === client.id ? updatedClient : c)),
+      );
+      if (onUpdateClient) onUpdateClient(updatedClient);
+    }
+    // Audit log: compare old vs new work fields and log changes
+    if (currentUser) {
+      const oldWork = work;
+      const newStatus = (workForm.status ||
+        (oldWork?.status ?? "Pending")) as string;
+      const newFilingStatus = workForm.filingStatus || "Pending";
+      const newAck = workForm.ackNumber || "";
+      const newItrForm = workForm.itrForm || "";
+      const newReturnType = workForm.returnType || "Original";
+      const newRemark = workForm.remark || "";
+      const newFilingDate = workForm.filingDate || "";
+      const ts = new Date().toISOString();
+      const logEntry = (field: string, oldVal: string, newVal: string) => {
+        if (oldVal === newVal) return;
+        storage.addAuditLog({
+          id: storage.uid(),
+          userId: currentUser.id,
+          userName: currentUser.name,
+          userRole: currentUser.role,
+          action: `Updated ${field}`,
+          clientId: client.id,
+          clientName: client.name,
+          fieldChanged: field,
+          oldValue: oldVal,
+          newValue: newVal,
+          timestamp: ts,
+        });
+      };
+      if (oldWork) {
+        const oldStatus =
+          oldWork.status === "Filed"
+            ? "Completed"
+            : (oldWork.status ?? "Pending");
+        logEntry("Work Status", oldStatus, newStatus);
+        logEntry(
+          "Filing Status",
+          oldWork.filingStatus ?? "Pending",
+          newFilingStatus,
+        );
+        logEntry("Ack Number", oldWork.ackNumber || "-", newAck || "-");
+        logEntry(
+          "Filing Date",
+          oldWork.filingDate || "-",
+          newFilingDate || "-",
+        );
+        logEntry("ITR Form", oldWork.itrForm || "-", newItrForm || "-");
+        logEntry(
+          "Return Type",
+          oldWork.returnType || "Original",
+          newReturnType,
+        );
+        if ((oldWork.remark || "") !== newRemark)
+          logEntry("Remark", oldWork.remark || "-", newRemark || "-");
+        if (dueDate !== (client.dueDate || ""))
+          logEntry("Due Date", client.dueDate || "-", dueDate || "-");
+      } else {
+        // New work record created
+        storage.addAuditLog({
+          id: storage.uid(),
+          userId: currentUser.id,
+          userName: currentUser.name,
+          userRole: currentUser.role,
+          action: "Work Processing Created",
+          clientId: client.id,
+          clientName: client.name,
+          fieldChanged: "Work Processing",
+          oldValue: "-",
+          newValue: `Status: ${newStatus}, Filing: ${newFilingStatus}`,
+          timestamp: ts,
+        });
+      }
+    }
+    setWorkSaved(true);
+    setTimeout(() => setWorkSaved(false), 2000);
+    setRefreshKey((k) => k + 1);
+  };
+
+  const currentWork = work ? { ...work, ...workForm } : workForm;
+  const headOfIncome = getHeadOfIncome(client);
+
+  // Whether ack number is complete -- restricts filing status options
+  const ackComplete =
+    !!currentWork.ackNumber && /^\d{15}$/.test(currentWork.ackNumber);
+
+  const filingStatusColor = (status: string) => {
+    if (status === "E-Verified") return "text-green-700";
+    if (status === "Pending for E-verification") return "text-blue-700";
+    return "text-orange-700";
+  };
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center gap-3 flex-wrap">
+        <button
+          type="button"
+          onClick={onBack}
+          className="flex items-center gap-1 text-sm hover:underline"
+          style={{ color: "var(--theme-primary, #6B1A2B)" }}
+        >
+          <ArrowLeft className="w-4 h-4" /> Back
+        </button>
+        <div className="h-5 w-px bg-gray-300" />
+        <h2 className="font-semibold text-gray-800">{client.name}</h2>
+        <span className="text-xs bg-gray-100 px-2 py-0.5 rounded font-mono">
+          {client.pan}
+        </span>
+        <span className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded">
+          {client.taxYear}
+        </span>
+        {/* Client Type badge derived from 4th PAN character */}
+        {client.pan && client.pan.length >= 4 && (
+          <span
+            className="text-xs px-2 py-0.5 rounded font-medium flex items-center gap-1"
+            style={{
+              background: "var(--theme-primary-light, rgba(107,26,43,0.1))",
+              color: "var(--theme-primary, #6B1A2B)",
+              border:
+                "1px solid var(--theme-primary-light, rgba(107,26,43,0.2))",
+            }}
+            title={`Client Type derived from PAN 4th character "${client.pan[3].toUpperCase()}"`}
+          >
+            {getPanCategory(client.pan) === "Individual" ? (
+              <User className="w-3 h-3" />
+            ) : (
+              <Building2 className="w-3 h-3" />
+            )}
+            {getPanCategory(client.pan)}
+          </span>
+        )}
+      </div>
+
+      {/* Client Info - fixed grid to prevent overlap */}
+      <div className="bg-white rounded-lg border p-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 text-sm">
+          <div className="min-w-0">
+            <span className="text-gray-500 text-xs">Mobile</span>
+            <div className="font-medium truncate">{client.mobile}</div>
+          </div>
+          <div className="min-w-0">
+            <span className="text-gray-500 text-xs">Email</span>
+            <div className="font-medium text-xs break-all leading-tight mt-0.5">
+              {client.email || "-"}
+            </div>
+          </div>
+          <div className="min-w-0">
+            <span className="text-gray-500 text-xs">Category</span>
+            <div className="font-medium truncate">{client.clientCategory}</div>
+          </div>
+          <div className="min-w-0">
+            <span className="text-gray-500 text-xs">Head of Income</span>
+            <div className="font-medium truncate">{headOfIncome}</div>
+          </div>
+          {headOfIncome === "Business" && client.businessName && (
+            <div className="min-w-0">
+              <span className="text-gray-500 text-xs">Business Name</span>
+              <div className="font-medium truncate">{client.businessName}</div>
+            </div>
+          )}
+          <div className="min-w-0">
+            <span className="text-gray-500 text-xs">Tax Year</span>
+            <div className="font-medium">{client.taxYear}</div>
+          </div>
+          <div className="min-w-0">
+            <span className="text-gray-500 text-xs">Due Date</span>
+            <div className="font-medium">{dueDate || client.dueDate}</div>
+          </div>
+        </div>
+      </div>
+
+      <Tabs defaultValue="documents">
+        <TabsList
+          style={{
+            background: "var(--theme-primary-light, rgba(107,26,43,0.1))",
+          }}
+        >
+          <TabsTrigger value="documents" style={{ fontWeight: 600 }}>
+            Document Inward
+          </TabsTrigger>
+          <TabsTrigger value="work" style={{ fontWeight: 600 }}>
+            Work Processing
+          </TabsTrigger>
+          <TabsTrigger value="clienttype" style={{ fontWeight: 600 }}>
+            Client Type
+          </TabsTrigger>
+        </TabsList>
+
+        {/* Document Inward Tab */}
+        <TabsContent value="documents" className="mt-4 space-y-4">
+          <div className="bg-white rounded-lg border p-4">
+            <h3
+              className="font-semibold mb-3"
+              style={{ color: "var(--theme-primary, #6B1A2B)" }}
+            >
+              Add Document Entry
+            </h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div>
+                <Label className="text-xs">Date (no future) *</Label>
+                <DatePickerInput
+                  value={docForm.date}
+                  onChange={(v) => setDocForm((f) => ({ ...f, date: v }))}
+                  placeholder="DD-MM-YYYY"
+                  maxDate={today}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label className="text-xs">Mode</Label>
+                <Select
+                  value={docForm.mode}
+                  onValueChange={(v) =>
+                    setDocForm((f) => ({
+                      ...f,
+                      mode: v as DocumentInward["mode"],
+                    }))
+                  }
+                >
+                  <SelectTrigger className="mt-1">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Email">Email</SelectItem>
+                    <SelectItem value="WhatsApp">WhatsApp</SelectItem>
+                    <SelectItem value="Hardcopy">Hardcopy</SelectItem>
+                    <SelectItem value="Mix">Mix</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label className="text-xs">Status</Label>
+                <Select
+                  value={docForm.status}
+                  onValueChange={(v) =>
+                    setDocForm((f) => ({
+                      ...f,
+                      status: v as DocumentInward["status"],
+                    }))
+                  }
+                >
+                  <SelectTrigger className="mt-1">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Complete">Complete</SelectItem>
+                    <SelectItem value="Partial">Partial</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label className="text-xs">Remarks</Label>
+                <Input
+                  value={docForm.remarks}
+                  onChange={(e) =>
+                    setDocForm((f) => ({ ...f, remarks: e.target.value }))
+                  }
+                  placeholder="Optional notes"
+                  className="mt-1"
+                />
+              </div>
+            </div>
+            {docError && (
+              <p className="text-red-600 text-xs mt-2">{docError}</p>
+            )}
+            <Button
+              onClick={handleAddDoc}
+              size="sm"
+              className="mt-3 text-white"
+              style={{ background: "var(--theme-primary, #6B1A2B)" }}
+            >
+              <Plus className="w-3.5 h-3.5 mr-1" /> Add Entry
+            </Button>
+          </div>
+
+          {/* Document list */}
+          <div className="bg-white rounded-lg border overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead style={{ background: "var(--theme-primary, #6B1A2B)" }}>
+                <tr>
+                  {["Date", "Mode", "Status", "Remarks", "Action"].map((h) => (
+                    <th
+                      key={h}
+                      className="text-left py-2.5 px-4 text-white font-medium"
+                    >
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {docs.length === 0 && (
+                  <tr>
+                    <td colSpan={5} className="py-6 text-center text-gray-400">
+                      No documents yet. Add the first entry above.
+                    </td>
+                  </tr>
+                )}
+                {docs.map((d) => (
+                  <tr
+                    key={d.id}
+                    className="border-b last:border-0 hover:bg-gray-50"
+                  >
+                    <td className="py-2.5 px-4 font-mono text-xs">{d.date}</td>
+                    <td className="py-2.5 px-4">{d.mode}</td>
+                    <td className="py-2.5 px-4">
+                      <span
+                        className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                          d.status === "Complete"
+                            ? "bg-green-100 text-green-700"
+                            : "bg-yellow-100 text-yellow-700"
+                        }`}
+                      >
+                        {d.status}
+                      </span>
+                    </td>
+                    <td className="py-2.5 px-4 text-gray-500">
+                      {d.remarks || "-"}
+                    </td>
+                    <td className="py-2.5 px-4">
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteDoc(d.id)}
+                        className="p-1 rounded hover:bg-red-100 text-red-400"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </TabsContent>
+
+        {/* Work Processing Tab */}
+        <TabsContent value="work" className="mt-4">
+          <div className="bg-white rounded-lg border p-5 max-w-2xl space-y-4">
+            <h3
+              className="font-semibold"
+              style={{ color: "var(--theme-primary, #6B1A2B)" }}
+            >
+              Work Processing
+            </h3>
+
+            {/* Work Status */}
+            <div>
+              <Label>Work Status</Label>
+              <Select
+                value={currentWork.status || "Pending"}
+                onValueChange={(v) =>
+                  setWorkForm((f) => ({
+                    ...f,
+                    status: v as WorkProcessing["status"],
+                  }))
+                }
+              >
+                <SelectTrigger className="mt-1">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Pending">Pending</SelectItem>
+                  <SelectItem value="In Progress">In Progress</SelectItem>
+                  <SelectItem value="Completed">Completed</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* ITR Form + Return Type side by side */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label>ITR Form</Label>
+                <Select
+                  value={currentWork.itrForm || ""}
+                  onValueChange={(v) =>
+                    setWorkForm((f) => ({ ...f, itrForm: v }))
+                  }
+                >
+                  <SelectTrigger className="mt-1">
+                    <SelectValue placeholder="Select ITR Form" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ITR-1">ITR-1</SelectItem>
+                    <SelectItem value="ITR-2">ITR-2</SelectItem>
+                    <SelectItem value="ITR-3">ITR-3</SelectItem>
+                    <SelectItem value="ITR-4">ITR-4</SelectItem>
+                    <SelectItem value="ITR-5">ITR-5</SelectItem>
+                    <SelectItem value="ITR-6">ITR-6</SelectItem>
+                    <SelectItem value="ITR-7">ITR-7</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Return Type</Label>
+                <Select
+                  value={currentWork.returnType || "Original"}
+                  onValueChange={(v) =>
+                    setWorkForm((f) => ({
+                      ...f,
+                      returnType: v as WorkProcessing["returnType"],
+                    }))
+                  }
+                >
+                  <SelectTrigger className="mt-1">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Original">Original</SelectItem>
+                    <SelectItem value="Revised">Revised</SelectItem>
+                    <SelectItem value="Belated">Belated</SelectItem>
+                    <SelectItem value="Updated">Updated</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Remark */}
+            <div>
+              <Label>
+                Remark <span className="text-gray-400 text-xs">(optional)</span>
+              </Label>
+              <Input
+                value={currentWork.remark || ""}
+                onChange={(e) =>
+                  setWorkForm((f) => ({ ...f, remark: e.target.value }))
+                }
+                placeholder="e.g. Revision reason, notes for future reference..."
+                className="mt-1"
+              />
+            </div>
+
+            {/* Acknowledgement Number */}
+            <div>
+              <Label>Acknowledgement Number (15 digits)</Label>
+              <div
+                className="mt-1"
+                style={{
+                  border: "2px solid var(--theme-primary, #6B1A2B)",
+                  borderRadius: "8px",
+                  overflow: "hidden",
+                }}
+              >
+                <Input
+                  value={currentWork.ackNumber || ""}
+                  onChange={(e) => handleAckNumberChange(e.target.value)}
+                  placeholder="15-digit acknowledgement number"
+                  maxLength={15}
+                  inputMode="numeric"
+                  className="font-mono border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+                  style={{ border: "none", outline: "none", boxShadow: "none" }}
+                />
+              </div>
+              {(currentWork.ackNumber?.length || 0) > 0 && (
+                <p className="text-xs mt-1 text-gray-400">
+                  {currentWork.ackNumber?.length || 0}/15 digits
+                  {(currentWork.ackNumber?.length || 0) === 15 &&
+                    filingDateLocked && (
+                      <span className="ml-2 text-green-600">
+                        ✓ Filing date auto-filled
+                      </span>
+                    )}
+                </p>
+              )}
+              {ackError && (
+                <p className="text-red-600 text-xs mt-1 bg-red-50 rounded p-1.5">
+                  ⚠ {ackError}
+                </p>
+              )}
+            </div>
+
+            {/* Filing Date - always locked, auto-filled from Ack No */}
+            <div>
+              <Label>Filing Date</Label>
+              <div
+                className="mt-1 flex items-center gap-2 px-3 bg-gray-50 text-sm text-gray-700"
+                style={{
+                  height: "36px",
+                  border: "1px solid #d1d5db",
+                  borderRadius: "6px",
+                }}
+              >
+                <Lock className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                <span className="font-mono">
+                  {currentWork.filingDate || "—"}
+                </span>
+              </div>
+            </div>
+
+            {/* Due Date - editable, synced with Client Master */}
+            <div>
+              <Label>Due Date * (DD-MM-YYYY)</Label>
+              <DatePickerInput
+                value={dueDate}
+                onChange={(v) => setDueDate(v)}
+                placeholder="DD-MM-YYYY"
+              />
+              <p className="text-xs text-gray-400 mt-0.5">
+                Editable here and in Client Master — both stay in sync.
+              </p>
+            </div>
+            {/* Filing Status */}
+            <div>
+              <Label>Filing Status</Label>
+              {ackComplete ? (
+                <p className="text-xs text-blue-600 mt-0.5 mb-1">
+                  Acknowledgement number entered — only post-filing statuses
+                  available.
+                </p>
+              ) : (
+                <p className="text-xs text-orange-600 mt-0.5 mb-1">
+                  Enter a valid 15-digit Acknowledgement Number to change Filing
+                  Status.
+                </p>
+              )}
+              {/* Rule 3: when no valid ack, show locked "Pending" indicator (not a real dropdown) */}
+              {!ackComplete ? (
+                <div
+                  className="mt-1 flex items-center gap-2 px-3 bg-gray-50 text-sm text-orange-700"
+                  style={{
+                    height: "36px",
+                    border: "1px solid #d1d5db",
+                    borderRadius: "6px",
+                  }}
+                >
+                  <Lock className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                  <span>Pending</span>
+                </div>
+              ) : (
+                <Select
+                  value={
+                    currentWork.filingStatus || "Pending for E-verification"
+                  }
+                  onValueChange={(v) => {
+                    // Guard: if ack number present, block manual selection of "Pending"
+                    if (v === "Pending") return;
+                    setWorkForm((f) => ({
+                      ...f,
+                      filingStatus: v as WorkProcessing["filingStatus"],
+                    }));
+                  }}
+                >
+                  <SelectTrigger className="mt-1">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {/* Rule 4: only "Pending for E-verification" and "E-Verified" when ack present */}
+                    <SelectItem value="Pending for E-verification">
+                      Pending for E-verification
+                    </SelectItem>
+                    <SelectItem value="E-Verified">E-Verified</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+              {currentWork.filingStatus && (
+                <p
+                  className={`text-xs mt-1 ${filingStatusColor(ackComplete ? (currentWork.filingStatus ?? "Pending") : "Pending")}`}
+                >
+                  {ackComplete &&
+                    currentWork.filingStatus === "E-Verified" &&
+                    "✅ Client excluded from deadline alerts"}
+                  {ackComplete &&
+                    currentWork.filingStatus === "Pending for E-verification" &&
+                    "⚠️ E-verification must be done within 30 days of filing"}
+                  {!ackComplete && "Work is in progress"}
+                </p>
+              )}
+            </div>
+
+            {workError && (
+              <p className="text-red-600 text-sm bg-red-50 rounded p-2">
+                {workError}
+              </p>
+            )}
+            {workSaved && (
+              <p className="text-green-600 text-sm bg-green-50 rounded p-2">
+                ✅ Saved successfully!
+              </p>
+            )}
+            <Button
+              onClick={handleSaveWork}
+              style={{ background: "var(--theme-primary, #6B1A2B)" }}
+              className="text-white w-full"
+            >
+              <Save className="w-4 h-4 mr-2" /> Save Work Processing
+            </Button>
+          </div>
+        </TabsContent>
+
+        {/* Client Type Tab */}
+        <TabsContent value="clienttype" className="mt-4">
+          <ClientTypePanel pan={client.pan} />
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}

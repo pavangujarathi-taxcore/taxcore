@@ -1,0 +1,74 @@
+import {
+  type ReactNode,
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import { THEMES, type ThemeConfig, type ThemeKey } from "../types";
+
+interface ThemeContextType {
+  theme: ThemeConfig;
+  setTheme: (key: ThemeKey) => void;
+}
+
+const VALID_KEYS = Object.keys(THEMES) as ThemeKey[];
+
+function resolveThemeKey(raw: string | null): ThemeKey {
+  // Migrate old keys to new ones
+  if (raw === "emerald") return "forestgreen";
+  if (raw === "violet") return "yellow";
+  if (raw === "lightgreen") return "forestgreen";
+  if (raw && VALID_KEYS.includes(raw as ThemeKey)) return raw as ThemeKey;
+  return "burgundy";
+}
+
+const ThemeContext = createContext<ThemeContextType>({
+  theme: THEMES.burgundy,
+  setTheme: () => {},
+});
+
+export function ThemeProvider({ children }: { children: ReactNode }) {
+  const [themeKey, setThemeKey] = useState<ThemeKey>(() => {
+    return resolveThemeKey(localStorage.getItem("taxcore_theme"));
+  });
+
+  useEffect(() => {
+    const t = THEMES[themeKey];
+    document.documentElement.style.setProperty("--theme-primary", t.primary);
+    document.documentElement.style.setProperty(
+      "--theme-primary-light",
+      t.primaryLight,
+    );
+    document.documentElement.style.setProperty("--theme-gold", t.gold);
+    document.documentElement.style.setProperty(
+      "--theme-active-highlight",
+      t.activeHighlight,
+    );
+    document.documentElement.style.setProperty("--theme-subtitle", t.subtitle);
+    document.documentElement.style.setProperty(
+      "--theme-page-title",
+      t.pageTitleColor,
+    );
+    document.documentElement.style.setProperty("--theme-avatar-bg", t.avatarBg);
+    document.documentElement.style.setProperty(
+      "--theme-avatar-text",
+      t.avatarText,
+    );
+  }, [themeKey]);
+
+  const setTheme = (key: ThemeKey) => {
+    localStorage.setItem("taxcore_theme", key);
+    setThemeKey(key);
+  };
+
+  return (
+    <ThemeContext.Provider value={{ theme: THEMES[themeKey], setTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
+}
+
+export function useTheme() {
+  return useContext(ThemeContext);
+}
