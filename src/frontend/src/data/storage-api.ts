@@ -467,6 +467,22 @@ export const storage = {
   uid,
 
   getLastSyncTime: (): Date | null => lastSyncTime,
+  
+  // ─── Super Admin & Firm Login Tracking ────────────────────────────────────────
+  
+  markSuperAdminCreated: (): void => {
+    storage.setSuperAdminCreated(true);
+  },
+
+  updateFirmLastLogin: (ownerId: string): void => {
+    const firms = cache.firmAccounts;
+    const updated = firms.map(f => 
+      f.id === ownerId 
+        ? { ...f, lastLogin: new Date().toISOString() } 
+        : f
+    );
+    storage.saveFirmAccounts(updated);
+  },
 };
 
 // ─── Storage Change Listener ───────────────────────────────────────────────────
