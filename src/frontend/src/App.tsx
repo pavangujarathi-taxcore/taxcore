@@ -111,16 +111,35 @@ export default function App() {
       });
   }, []);
 
-  // Auto-refresh from canister every 1 second when logged in (real-time sync)
+  // Auto-refresh from backend every 1 second when logged in (real-time sync)
+  // Optimized: pauses when tab is hidden to save resources
   // biome-ignore lint/correctness/useExhaustiveDependencies: user.id is the stable identity key
   useEffect(() => {
     if (!user) return;
+    
+    let isActive = true;
+    
+    // Pause polling when tab is hidden
+    const handleVisibilityChange = () => {
+      isActive = !document.hidden;
+      if (isActive) {
+        silentRefreshFromCanister().catch(() => {});
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
     // Immediately sync on login
     silentRefreshFromCanister().catch(() => {});
     const interval = setInterval(() => {
-      silentRefreshFromCanister().catch(() => {});
+      if (isActive) {
+        silentRefreshFromCanister().catch(() => {});
+      }
     }, 1_000); // 1 second for real-time sync
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [user]);
 
   useEffect(() => {

@@ -215,39 +215,28 @@ export async function whenInitialized(): Promise<void> {
 // ─── Silent refresh for real-time sync (called every 2 seconds) ───────────────
 
 export async function silentRefreshFromCanister(): Promise<void> {
+  if (!isSyncOnline) return; // Skip if already offline
+  
   try {
     const data = await apiGet("/api/sync/all");
     
     let changed = false;
 
-    if (JSON.stringify(cache.clients) !== JSON.stringify(data.clients || [])) {
-      cache.clients = data.clients || [];
-      saveToLocalStorage(STORAGE_KEYS.clients, cache.clients);
-      changed = true;
-    }
+    // Only update if data actually changed (reduce unnecessary re-renders)
+    const updates = [
+      { key: 'clients', newData: data.clients || [] },
+      { key: 'users', newData: data.users || [] },
+      { key: 'documents', newData: data.documents || [] },
+      { key: 'work', newData: data.work || [] },
+      { key: 'billing', newData: data.billing || [] }
+    ];
 
-    if (JSON.stringify(cache.users) !== JSON.stringify(data.users || [])) {
-      cache.users = data.users || [];
-      saveToLocalStorage(STORAGE_KEYS.users, cache.users);
-      changed = true;
-    }
-
-    if (JSON.stringify(cache.documents) !== JSON.stringify(data.documents || [])) {
-      cache.documents = data.documents || [];
-      saveToLocalStorage(STORAGE_KEYS.documents, cache.documents);
-      changed = true;
-    }
-
-    if (JSON.stringify(cache.work) !== JSON.stringify(data.work || [])) {
-      cache.work = data.work || [];
-      saveToLocalStorage(STORAGE_KEYS.work, cache.work);
-      changed = true;
-    }
-
-    if (JSON.stringify(cache.billing) !== JSON.stringify(data.billing || [])) {
-      cache.billing = data.billing || [];
-      saveToLocalStorage(STORAGE_KEYS.billing, cache.billing);
-      changed = true;
+    for (const { key, newData } of updates) {
+      if (JSON.stringify(cache[key]) !== JSON.stringify(newData)) {
+        cache[key] = newData;
+        saveToLocalStorage(STORAGE_KEYS[key], newData);
+        changed = true;
+      }
     }
 
     // Sync superAdminCreated flag
@@ -265,8 +254,8 @@ export async function silentRefreshFromCanister(): Promise<void> {
 
     isSyncOnline = true;
   } catch (err) {
-    console.warn("[storage] Silent refresh failed:", err);
     isSyncOnline = false;
+    // Silent fail - don't log on every poll
   }
 }
 
