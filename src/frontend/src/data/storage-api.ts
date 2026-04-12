@@ -145,24 +145,11 @@ export async function initialize(): Promise<void> {
 
   console.log("🔄 [storage] Initializing from backend API...");
 
-  // First load from localStorage for instant UI
-  cache.users = loadFromLocalStorage<User>(STORAGE_KEYS.users);
-  cache.clients = loadFromLocalStorage<Client>(STORAGE_KEYS.clients);
-  cache.documents = loadFromLocalStorage<DocumentInward>(STORAGE_KEYS.documents);
-  cache.work = loadFromLocalStorage<WorkProcessing>(STORAGE_KEYS.work);
-  cache.billing = loadFromLocalStorage<Billing>(STORAGE_KEYS.billing);
-  cache.firmAccounts = loadFromLocalStorage<FirmAccount>(STORAGE_KEYS.firmAccounts);
-  cache.auditLogs = loadFromLocalStorage<AuditLogEntry>(STORAGE_KEYS.auditLogs);
-  cache.notificationLogs = loadFromLocalStorage<NotificationLog>(STORAGE_KEYS.notificationLogs);
-  cache.whatsappSettings = loadSingleFromLocalStorage<WhatsAppSettings>(STORAGE_KEYS.whatsappSettings);
-  
-  const superAdminFlag = localStorage.getItem(STORAGE_KEYS.superAdminCreated);
-  cache.superAdminCreated = superAdminFlag === "true";
-
-  // CRITICAL: Always fetch from backend to get latest data
+  // CRITICAL: Fetch from backend FIRST (source of truth)
   try {
     const data = await apiGet("/api/sync/all");
     
+    // Update cache with backend data (ONLY source of truth)
     cache.users = data.users || [];
     cache.clients = data.clients || [];
     cache.documents = data.documents || [];
@@ -171,14 +158,14 @@ export async function initialize(): Promise<void> {
     cache.firmAccounts = data.firmAccounts || [];
     cache.auditLogs = data.auditLogs || [];
     
-    // CRITICAL: Check both flag AND if Super Admin exists
+    // Check both flag AND if Super Admin exists
     const backendFlag = data.settings?.superAdminCreated || false;
     const hasSuperAdmin = cache.users.some(u => u.role === "Super Admin");
-    cache.superAdminCreated = backendFlag || hasSuperAdmin; // True if either condition is met
+    cache.superAdminCreated = backendFlag || hasSuperAdmin;
     
     cache.whatsappSettings = data.settings?.whatsAppSettings || null;
 
-    // Save to localStorage
+    // Save to localStorage AFTER backend data is loaded
     saveToLocalStorage(STORAGE_KEYS.users, cache.users);
     saveToLocalStorage(STORAGE_KEYS.clients, cache.clients);
     saveToLocalStorage(STORAGE_KEYS.documents, cache.documents);
@@ -199,7 +186,21 @@ export async function initialize(): Promise<void> {
       hasSuperAdmin: hasSuperAdmin,
     });
   } catch (err) {
-    console.error("❌ [storage] Backend sync failed, using localStorage:", err);
+    console.error("❌ [storage] Backend sync failed:", err);
+    // Only load from localStorage if backend fails
+    cache.users = loadFromLocalStorage<User>(STORAGE_KEYS.users);
+    cache.clients = loadFromLocalStorage<Client>(STORAGE_KEYS.clients);
+    cache.documents = loadFromLocalStorage<DocumentInward>(STORAGE_KEYS.documents);
+    cache.work = loadFromLocalStorage<WorkProcessing>(STORAGE_KEYS.work);
+    cache.billing = loadFromLocalStorage<Billing>(STORAGE_KEYS.billing);
+    cache.firmAccounts = loadFromLocalStorage<FirmAccount>(STORAGE_KEYS.firmAccounts);
+    cache.auditLogs = loadFromLocalStorage<AuditLogEntry>(STORAGE_KEYS.auditLogs);
+    cache.notificationLogs = loadFromLocalStorage<NotificationLog>(STORAGE_KEYS.notificationLogs);
+    cache.whatsappSettings = loadSingleFromLocalStorage<WhatsAppSettings>(STORAGE_KEYS.whatsappSettings);
+    
+    const superAdminFlag = localStorage.getItem(STORAGE_KEYS.superAdminCreated);
+    cache.superAdminCreated = superAdminFlag === "true";
+    
     isSyncOnline = false;
   }
 

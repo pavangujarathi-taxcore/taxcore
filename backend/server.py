@@ -148,11 +148,19 @@ def get_users() -> Dict[str, List[Dict[str, Any]]]:
 
 @app.post("/api/users")
 def save_users(data: Dict[str, List[Dict[str, Any]]]) -> Dict[str, Union[bool, int]]:
-    """Save users to database"""
+    """Save users to database using upsert"""
     users: List[Dict[str, Any]] = data.get("users", [])
-    if users:
-        users_col.delete_many({})
-        users_col.insert_many(users)
+    
+    existing_ids = {str(u.get("id")) for u in users_col.find({}, {"id": 1, "_id": 0})}
+    incoming_ids = {str(u.get("id")) for u in users}
+    
+    to_delete = existing_ids - incoming_ids
+    if to_delete:
+        users_col.delete_many({"id": {"$in": list(to_delete)}})
+    
+    for user in users:
+        users_col.replace_one({"id": user.get("id")}, user, upsert=True)
+    
     return {"success": True, "count": len(users)}
 
 # =============================================================================
@@ -169,11 +177,22 @@ def get_clients() -> Dict[str, List[Dict[str, Any]]]:
 
 @app.post("/api/clients")
 def save_clients(data: Dict[str, List[Dict[str, Any]]]) -> Dict[str, Union[bool, int]]:
-    """Save clients to database"""
+    """Save clients to database using upsert (no delete-all)"""
     clients: List[Dict[str, Any]] = data.get("clients", [])
-    if clients:
-        clients_col.delete_many({})
-        clients_col.insert_many(clients)
+    
+    # Get existing client IDs from database
+    existing_ids = {str(c.get("id")) for c in clients_col.find({}, {"id": 1, "_id": 0})}
+    incoming_ids = {str(c.get("id")) for c in clients}
+    
+    # Delete clients that are no longer in the incoming list
+    to_delete = existing_ids - incoming_ids
+    if to_delete:
+        clients_col.delete_many({"id": {"$in": list(to_delete)}})
+    
+    # Upsert each client
+    for client in clients:
+        clients_col.replace_one({"id": client.get("id")}, client, upsert=True)
+    
     return {"success": True, "count": len(clients)}
 
 # =============================================================================
@@ -190,11 +209,19 @@ def get_documents() -> Dict[str, List[Dict[str, Any]]]:
 
 @app.post("/api/documents")
 def save_documents(data: Dict[str, List[Dict[str, Any]]]) -> Dict[str, Union[bool, int]]:
-    """Save documents to database"""
+    """Save documents to database using upsert"""
     documents: List[Dict[str, Any]] = data.get("documents", [])
-    if documents:
-        documents_col.delete_many({})
-        documents_col.insert_many(documents)
+    
+    existing_ids = {str(d.get("id")) for d in documents_col.find({}, {"id": 1, "_id": 0})}
+    incoming_ids = {str(d.get("id")) for d in documents}
+    
+    to_delete = existing_ids - incoming_ids
+    if to_delete:
+        documents_col.delete_many({"id": {"$in": list(to_delete)}})
+    
+    for doc in documents:
+        documents_col.replace_one({"id": doc.get("id")}, doc, upsert=True)
+    
     return {"success": True, "count": len(documents)}
 
 # =============================================================================
@@ -211,11 +238,19 @@ def get_work() -> Dict[str, List[Dict[str, Any]]]:
 
 @app.post("/api/work")
 def save_work(data: Dict[str, List[Dict[str, Any]]]) -> Dict[str, Union[bool, int]]:
-    """Save work processing records to database"""
+    """Save work processing records to database using upsert"""
     work: List[Dict[str, Any]] = data.get("work", [])
-    if work:
-        work_col.delete_many({})
-        work_col.insert_many(work)
+    
+    existing_ids = {str(w.get("id")) for w in work_col.find({}, {"id": 1, "_id": 0})}
+    incoming_ids = {str(w.get("id")) for w in work}
+    
+    to_delete = existing_ids - incoming_ids
+    if to_delete:
+        work_col.delete_many({"id": {"$in": list(to_delete)}})
+    
+    for w in work:
+        work_col.replace_one({"id": w.get("id")}, w, upsert=True)
+    
     return {"success": True, "count": len(work)}
 
 # =============================================================================
@@ -232,11 +267,19 @@ def get_billing() -> Dict[str, List[Dict[str, Any]]]:
 
 @app.post("/api/billing")
 def save_billing(data: Dict[str, List[Dict[str, Any]]]) -> Dict[str, Union[bool, int]]:
-    """Save billing records to database"""
+    """Save billing records to database using upsert"""
     billing: List[Dict[str, Any]] = data.get("billing", [])
-    if billing:
-        billing_col.delete_many({})
-        billing_col.insert_many(billing)
+    
+    existing_ids = {str(b.get("id")) for b in billing_col.find({}, {"id": 1, "_id": 0})}
+    incoming_ids = {str(b.get("id")) for b in billing}
+    
+    to_delete = existing_ids - incoming_ids
+    if to_delete:
+        billing_col.delete_many({"id": {"$in": list(to_delete)}})
+    
+    for b in billing:
+        billing_col.replace_one({"id": b.get("id")}, b, upsert=True)
+    
     return {"success": True, "count": len(billing)}
 
 # =============================================================================
@@ -253,11 +296,19 @@ def get_firm_accounts() -> Dict[str, List[Dict[str, Any]]]:
 
 @app.post("/api/firm-accounts")
 def save_firm_accounts(data: Dict[str, List[Dict[str, Any]]]) -> Dict[str, Union[bool, int]]:
-    """Save firm accounts to database"""
+    """Save firm accounts to database using upsert"""
     accounts: List[Dict[str, Any]] = data.get("firmAccounts", [])
-    if accounts:
-        firm_accounts_col.delete_many({})
-        firm_accounts_col.insert_many(accounts)
+    
+    existing_ids = {str(a.get("id")) for a in firm_accounts_col.find({}, {"id": 1, "_id": 0})}
+    incoming_ids = {str(a.get("id")) for a in accounts}
+    
+    to_delete = existing_ids - incoming_ids
+    if to_delete:
+        firm_accounts_col.delete_many({"id": {"$in": list(to_delete)}})
+    
+    for acc in accounts:
+        firm_accounts_col.replace_one({"id": acc.get("id")}, acc, upsert=True)
+    
     return {"success": True, "count": len(accounts)}
 
 # =============================================================================
