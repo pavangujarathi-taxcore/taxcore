@@ -159,8 +159,8 @@ export async function initialize(): Promise<void> {
   const superAdminFlag = localStorage.getItem(STORAGE_KEYS.superAdminCreated);
   cache.superAdminCreated = superAdminFlag === "true";
 
+  // CRITICAL: Always fetch from backend to get latest data
   try {
-    // Then fetch latest from backend
     const data = await apiGet("/api/sync/all");
     
     cache.users = data.users || [];
@@ -170,7 +170,12 @@ export async function initialize(): Promise<void> {
     cache.billing = data.billing || [];
     cache.firmAccounts = data.firmAccounts || [];
     cache.auditLogs = data.auditLogs || [];
-    cache.superAdminCreated = data.settings?.superAdminCreated || false;
+    
+    // CRITICAL: Check both flag AND if Super Admin exists
+    const backendFlag = data.settings?.superAdminCreated || false;
+    const hasSuperAdmin = cache.users.some(u => u.role === "Super Admin");
+    cache.superAdminCreated = backendFlag || hasSuperAdmin; // True if either condition is met
+    
     cache.whatsappSettings = data.settings?.whatsAppSettings || null;
 
     // Save to localStorage
@@ -190,9 +195,8 @@ export async function initialize(): Promise<void> {
     console.log("✅ [storage] Initialized from backend:", {
       users: cache.users.length,
       clients: cache.clients.length,
-      documents: cache.documents.length,
-      work: cache.work.length,
-      billing: cache.billing.length,
+      superAdminCreated: cache.superAdminCreated,
+      hasSuperAdmin: hasSuperAdmin,
     });
   } catch (err) {
     console.error("❌ [storage] Backend sync failed, using localStorage:", err);
@@ -204,7 +208,7 @@ export async function initialize(): Promise<void> {
 }
 
 export async function whenInitialized(): Promise<void> {
-  return initialize();
+  await initialize();
 }
 
 // ─── Silent refresh for real-time sync (called every 2 seconds) ───────────────
