@@ -89,6 +89,57 @@ export class ExternalBlob {
         return this;
     }
 }
+export interface WriteResult {
+    ok: boolean;
+    message: string;
+}
+export interface FirmSummary {
+    ownerEmail: string;
+    status: string;
+    ownerName: string;
+    firmNumber: string;
+    clientCount: bigint;
+    firmName: string;
+    firmId: FirmId;
+    lastLogin: bigint;
+    planType: string;
+    ownerMobile: string;
+}
+export interface ScanResult {
+    ok: boolean;
+    totalRecordsScanned: bigint;
+    assigned: bigint;
+    skipped: boolean;
+    hadFirmId: bigint;
+    missingFirmId: bigint;
+    unmatched: bigint;
+    message: string;
+    perFirmDetails: Array<FirmAssignmentDetail>;
+}
+export interface FirmAssignmentDetail {
+    assigned: bigint;
+    firmNumber: string;
+    firmId: FirmId;
+}
+export interface MigrationResult {
+    ok: boolean;
+    perFirmCounts: Array<FirmMigrationCount>;
+    skipped: boolean;
+    message: string;
+    orphanedCount: bigint;
+    totalRecords: bigint;
+}
+export interface FirmMigrationCount {
+    firmNumber: string;
+    firmId: FirmId;
+    recordCount: bigint;
+}
+export interface WriteContext {
+    userId: string;
+    role: string;
+    firmId: FirmId;
+}
+export type FirmId = string;
 export enum UserRole {
     admin = "admin",
     user = "user",
@@ -97,12 +148,45 @@ export enum UserRole {
 export interface backendInterface {
     _initializeAccessControl(): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
+    backfillFirmNumbers(): Promise<bigint>;
+    forceRecoverFirmData(adminRole: string, targetFirmId: FirmId, appDataPayload: string, recordCount: bigint): Promise<WriteResult>;
+    getActiveFirmAppData(firmId: FirmId, role: string): Promise<string>;
+    getAllFirmSummaries(adminRole: string): Promise<Array<FirmSummary>>;
+    getAutoAssignStatus(): Promise<{
+        migratedRecords: bigint;
+        autoAssignVersion: bigint;
+        autoAssignRan: boolean;
+        adminFirmId: string;
+    }>;
     getCallerUserRole(): Promise<UserRole>;
+    getFirmAppData(firmId: FirmId, role: string): Promise<string>;
+    getFirmAppDataCount(): Promise<bigint>;
+    getFirmUserData(firmId: FirmId, role: string): Promise<string>;
     getGlobalAppData(): Promise<string>;
     getGlobalUserDatabase(): Promise<string>;
+    getMigrationStatus(): Promise<{
+        migratedRecords: bigint;
+        autoAssignVersion: bigint;
+        migrated: boolean;
+        autoAssignRan: boolean;
+        migrationVersion: bigint;
+        adminFirmId: string;
+    }>;
+    getMigrationVersion(): Promise<bigint>;
+    getNextFirmNumber(firmId: FirmId): Promise<string>;
     isCallerAdmin(): Promise<boolean>;
+    migrateExistingDataToAdminFirm(adminFirmId: FirmId, existingAppData: string, existingUserDb: string): Promise<WriteResult>;
+    migratePreIsolationData(adminRole: string, adminFirmId: FirmId, firmPartitions: Array<[FirmId, string]>, orphanedAppData: string, orphanedCount: bigint, auditEntry: string): Promise<MigrationResult>;
+    needsAutoAssign(): Promise<boolean>;
+    peekNextFirmNumber(): Promise<string>;
+    registerFirm(firmId: FirmId, firmName: string, ownerName: string, ownerEmail: string, ownerMobile: string): Promise<WriteResult>;
+    resetAutoAssign(adminRole: string): Promise<WriteResult>;
+    saveFirmAppData(ctx: WriteContext, payload: string): Promise<WriteResult>;
+    saveFirmUserData(ctx: WriteContext, payload: string): Promise<WriteResult>;
     saveGlobalAppData(json: string): Promise<void>;
     saveGlobalUserDatabase(json: string): Promise<void>;
+    scanAndAutoAssignFirmIds(adminRole: string, adminFirmId: FirmId, firmPartitions: Array<[FirmId, string, bigint]>, orphanedPayload: string, totalScanned: bigint, hadFirmId: bigint, missingFirmId: bigint, unmatched: bigint, force: boolean): Promise<ScanResult>;
+    updateFirmPlan(adminRole: string, targetFirmId: FirmId, planType: string, status: string): Promise<WriteResult>;
 }
 import type { UserRole as _UserRole } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
@@ -135,6 +219,81 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async backfillFirmNumbers(): Promise<bigint> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.backfillFirmNumbers();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.backfillFirmNumbers();
+            return result;
+        }
+    }
+    async forceRecoverFirmData(arg0: string, arg1: FirmId, arg2: string, arg3: bigint): Promise<WriteResult> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.forceRecoverFirmData(arg0, arg1, arg2, arg3);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.forceRecoverFirmData(arg0, arg1, arg2, arg3);
+            return result;
+        }
+    }
+    async getActiveFirmAppData(arg0: FirmId, arg1: string): Promise<string> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getActiveFirmAppData(arg0, arg1);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getActiveFirmAppData(arg0, arg1);
+            return result;
+        }
+    }
+    async getAllFirmSummaries(arg0: string): Promise<Array<FirmSummary>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getAllFirmSummaries(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getAllFirmSummaries(arg0);
+            return result;
+        }
+    }
+    async getAutoAssignStatus(): Promise<{
+        migratedRecords: bigint;
+        autoAssignVersion: bigint;
+        autoAssignRan: boolean;
+        adminFirmId: string;
+    }> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getAutoAssignStatus();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getAutoAssignStatus();
+            return result;
+        }
+    }
     async getCallerUserRole(): Promise<UserRole> {
         if (this.processError) {
             try {
@@ -147,6 +306,48 @@ export class Backend implements backendInterface {
         } else {
             const result = await this.actor.getCallerUserRole();
             return from_candid_UserRole_n3(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getFirmAppData(arg0: FirmId, arg1: string): Promise<string> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getFirmAppData(arg0, arg1);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getFirmAppData(arg0, arg1);
+            return result;
+        }
+    }
+    async getFirmAppDataCount(): Promise<bigint> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getFirmAppDataCount();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getFirmAppDataCount();
+            return result;
+        }
+    }
+    async getFirmUserData(arg0: FirmId, arg1: string): Promise<string> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getFirmUserData(arg0, arg1);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getFirmUserData(arg0, arg1);
+            return result;
         }
     }
     async getGlobalAppData(): Promise<string> {
@@ -177,6 +378,55 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async getMigrationStatus(): Promise<{
+        migratedRecords: bigint;
+        autoAssignVersion: bigint;
+        migrated: boolean;
+        autoAssignRan: boolean;
+        migrationVersion: bigint;
+        adminFirmId: string;
+    }> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getMigrationStatus();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getMigrationStatus();
+            return result;
+        }
+    }
+    async getMigrationVersion(): Promise<bigint> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getMigrationVersion();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getMigrationVersion();
+            return result;
+        }
+    }
+    async getNextFirmNumber(arg0: FirmId): Promise<string> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getNextFirmNumber(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getNextFirmNumber(arg0);
+            return result;
+        }
+    }
     async isCallerAdmin(): Promise<boolean> {
         if (this.processError) {
             try {
@@ -188,6 +438,118 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.isCallerAdmin();
+            return result;
+        }
+    }
+    async migrateExistingDataToAdminFirm(arg0: FirmId, arg1: string, arg2: string): Promise<WriteResult> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.migrateExistingDataToAdminFirm(arg0, arg1, arg2);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.migrateExistingDataToAdminFirm(arg0, arg1, arg2);
+            return result;
+        }
+    }
+    async migratePreIsolationData(arg0: string, arg1: FirmId, arg2: Array<[FirmId, string]>, arg3: string, arg4: bigint, arg5: string): Promise<MigrationResult> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.migratePreIsolationData(arg0, arg1, arg2, arg3, arg4, arg5);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.migratePreIsolationData(arg0, arg1, arg2, arg3, arg4, arg5);
+            return result;
+        }
+    }
+    async needsAutoAssign(): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.needsAutoAssign();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.needsAutoAssign();
+            return result;
+        }
+    }
+    async peekNextFirmNumber(): Promise<string> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.peekNextFirmNumber();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.peekNextFirmNumber();
+            return result;
+        }
+    }
+    async registerFirm(arg0: FirmId, arg1: string, arg2: string, arg3: string, arg4: string): Promise<WriteResult> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.registerFirm(arg0, arg1, arg2, arg3, arg4);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.registerFirm(arg0, arg1, arg2, arg3, arg4);
+            return result;
+        }
+    }
+    async resetAutoAssign(arg0: string): Promise<WriteResult> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.resetAutoAssign(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.resetAutoAssign(arg0);
+            return result;
+        }
+    }
+    async saveFirmAppData(arg0: WriteContext, arg1: string): Promise<WriteResult> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.saveFirmAppData(arg0, arg1);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.saveFirmAppData(arg0, arg1);
+            return result;
+        }
+    }
+    async saveFirmUserData(arg0: WriteContext, arg1: string): Promise<WriteResult> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.saveFirmUserData(arg0, arg1);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.saveFirmUserData(arg0, arg1);
             return result;
         }
     }
@@ -216,6 +578,34 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.saveGlobalUserDatabase(arg0);
+            return result;
+        }
+    }
+    async scanAndAutoAssignFirmIds(arg0: string, arg1: FirmId, arg2: Array<[FirmId, string, bigint]>, arg3: string, arg4: bigint, arg5: bigint, arg6: bigint, arg7: bigint, arg8: boolean): Promise<ScanResult> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.scanAndAutoAssignFirmIds(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.scanAndAutoAssignFirmIds(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+            return result;
+        }
+    }
+    async updateFirmPlan(arg0: string, arg1: FirmId, arg2: string, arg3: string): Promise<WriteResult> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.updateFirmPlan(arg0, arg1, arg2, arg3);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.updateFirmPlan(arg0, arg1, arg2, arg3);
             return result;
         }
     }

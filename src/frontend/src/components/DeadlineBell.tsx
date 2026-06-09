@@ -5,7 +5,7 @@ import {
   getEVerificationAlerts,
   onStorageChange,
   storage,
-} from "../data/storage-api";
+} from "../data/storage";
 import type { Page, User } from "../types";
 
 interface DeadlineBellProps {

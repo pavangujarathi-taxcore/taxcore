@@ -11,7 +11,6 @@ import {
   Briefcase,
   ClipboardList,
   Download,
-  Upload,
   Eye,
   EyeOff,
   LayoutDashboard,
@@ -33,9 +32,10 @@ import {
   onStorageChange,
   refreshFromCanister,
   storage,
-} from "../data/storage-api";
+} from "../data/storage";
 import { type Page, THEMES, type User } from "../types";
 import DeadlineBell from "./DeadlineBell";
+const APP_VERSION = "85";
 
 const ownerNavItems: {
   id: Page;
@@ -60,7 +60,6 @@ const ownerNavItems: {
   },
   { id: "audit-log", label: "Audit Log", icon: ClipboardList, ownerOnly: true },
   { id: "export", label: "Export", icon: Download },
-  { id: "import", label: "Import", icon: Upload },
   {
     id: "settings",
     label: "Settings",
@@ -91,7 +90,7 @@ export const pageTitles: Record<Page, string> = {
   billing: "Outward & Billing",
   "user-management": "User Management",
   export: "Export Data",
-  import: "Import Data",
+  "import-history": "Import History",
   "super-admin": "Administrator Panel",
   "audit-log": "Audit Log",
   settings: "Settings",
@@ -122,6 +121,13 @@ function EditProfileDialog({
   const [showCurrentPw, setShowCurrentPw] = useState(false);
   const [showNextPw, setShowNextPw] = useState(false);
   const [showConfirmPw, setShowConfirmPw] = useState(false);
+
+  const isOwner = user.role === "Owner";
+
+  // Resolve the sequential Firm ID for Owner accounts
+  const firmNumber = isOwner
+    ? storage.getFirmAccounts().find((f) => f.id === user.id)?.firmNumber
+    : undefined;
 
   const handleSaveProfile = () => {
     setProfileError("");
@@ -185,6 +191,44 @@ function EditProfileDialog({
         </DialogHeader>
         <div className="space-y-4 mt-2">
           <div className="space-y-3">
+            {/* Firm ID — read-only, shown for Owner accounts only */}
+            {isOwner && firmNumber && (
+              <div>
+                <Label>Firm ID</Label>
+                <div
+                  className="mt-1 flex items-center gap-2 px-3 py-2 rounded-md border text-sm font-mono select-all"
+                  style={{
+                    background: "#F9F7F4",
+                    borderColor: "#E5DFD5",
+                    color: theme.primary,
+                    fontWeight: 600,
+                    letterSpacing: "0.03em",
+                  }}
+                  data-ocid="profile.firm_id"
+                  title="Auto-generated Firm ID (read-only)"
+                >
+                  <Shield
+                    className="w-3.5 h-3.5 flex-shrink-0"
+                    style={{
+                      color:
+                        theme.gold !== "#FFFFFF" ? theme.primary : theme.gold,
+                    }}
+                  />
+                  {firmNumber}
+                  <span
+                    className="ml-auto text-xs px-1.5 py-0.5 rounded"
+                    style={{
+                      background: "#EDE8DC",
+                      color: "#A09080",
+                      fontWeight: 400,
+                      fontFamily: "inherit",
+                    }}
+                  >
+                    Read-only
+                  </span>
+                </div>
+              </div>
+            )}
             <div>
               <Label>Name *</Label>
               <Input
@@ -545,8 +589,8 @@ export default function Layout({
           </p>
         </div>
 
-        {/* Secure Cloud badge */}
-        <div className="px-4 pb-2">
+        {/* Secure Cloud badge + version */}
+        <div className="px-4 pb-2 flex items-center justify-between">
           <div
             className="flex items-center gap-1.5 px-2 py-1 rounded text-xs"
             style={{
@@ -560,6 +604,17 @@ export default function Layout({
             />
             <span>Secure Cloud &middot; Auto Backup</span>
           </div>
+          <span
+            className="text-xs px-1.5 py-0.5 rounded font-mono"
+            style={{
+              background: "rgba(255,255,255,0.1)",
+              color: "rgba(255,255,255,0.4)",
+            }}
+            title={`TaxCore Version ${APP_VERSION}`}
+            data-ocid="app.version_label"
+          >
+            v{APP_VERSION}
+          </span>
         </div>
 
         {/* User row */}
@@ -678,9 +733,17 @@ export default function Layout({
         <main className="flex-1 overflow-y-auto p-6">{children}</main>
 
         <footer
-          className="bg-white border-t px-6 py-2 flex items-center justify-end"
+          className="bg-white border-t px-6 py-2 flex items-center justify-between"
           style={{ borderColor: "#EDE8DC" }}
         >
+          <span
+            className="text-xs font-mono px-1.5 py-0.5 rounded"
+            style={{ color: "#B0A898", background: "#F5F3EE" }}
+            title={`TaxCore Version ${APP_VERSION}`}
+            data-ocid="footer.version_label"
+          >
+            v{APP_VERSION}
+          </span>
           <p className="text-xs text-gray-400">
             &copy; {new Date().getFullYear()} TaxCore &mdash; A complete
             workflow tool for tax professionals

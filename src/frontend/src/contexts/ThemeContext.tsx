@@ -15,13 +15,12 @@ interface ThemeContextType {
 const VALID_KEYS = Object.keys(THEMES) as ThemeKey[];
 
 function resolveThemeKey(raw: string | null): ThemeKey {
-  // Migrate old theme keys to new premium 4-theme system
-  if (raw === "emerald" || raw === "forestgreen" || raw === "mint" || raw === "lightgreen") return "purple";
+  // Migrate old keys to new ones
+  if (raw === "emerald") return "forestgreen";
   if (raw === "violet") return "yellow";
-  if (raw === "navy" || raw === "teal") return "sky";
-  if (raw === "coral") return "burgundy";
+  if (raw === "lightgreen") return "forestgreen";
   if (raw && VALID_KEYS.includes(raw as ThemeKey)) return raw as ThemeKey;
-  return "burgundy"; // Default to Linen & Burgundy theme
+  return "burgundy";
 }
 
 const ThemeContext = createContext<ThemeContextType>({

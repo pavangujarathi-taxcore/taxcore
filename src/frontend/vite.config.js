@@ -30,30 +30,12 @@ export default defineConfig({
     },
   },
   server: {
-    host: "0.0.0.0",
-    port: 3000,
-    strictPort: false,
-    hmr: {
-      clientPort: 443,
-      protocol: "wss",
-    },
     proxy: {
       "/api": {
         target: "http://127.0.0.1:4943",
         changeOrigin: true,
       },
     },
-  },
-  preview: {
-    host: "0.0.0.0",
-    port: 3000,
-    strictPort: false,
-    allowedHosts: [
-      "github-web-connect.cluster-12.preview.emergentcf.cloud",
-      ".preview.emergentcf.cloud",
-      ".emergentagent.com",
-      "localhost",
-    ],
   },
   plugins: [
     environment("all", { prefix: "CANISTER_" }),

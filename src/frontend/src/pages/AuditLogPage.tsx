@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { onStorageChange, storage } from "../data/storage-api";
+import { onStorageChange, storage } from "../data/storage";
 import type { AuditLogEntry, User } from "../types";
 
 function toLocalDateInputValue(date: Date): string {
@@ -96,7 +96,6 @@ export default function AuditLogPage({ user }: AuditLogPageProps) {
       );
     });
     return unsub;
-    // biome-ignore lint/correctness/useExhaustiveDependencies: stable
   }, [isOwner, user.id]);
 
   // Build user filter list from visible logs
@@ -280,6 +279,12 @@ export default function AuditLogPage({ user }: AuditLogPageProps) {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b">
+              <th
+                className="text-center py-3 px-3 font-semibold text-xs uppercase tracking-wide"
+                style={{ color: "#c9a44c", width: 52 }}
+              >
+                Sr.No.
+              </th>
               {["Time", "Action By", "Client", "Field Changed", "Change"].map(
                 (h) => (
                   <th
@@ -297,7 +302,7 @@ export default function AuditLogPage({ user }: AuditLogPageProps) {
             {filteredLogs.length === 0 && (
               <tr>
                 <td
-                  colSpan={5}
+                  colSpan={6}
                   className="py-12 text-center text-gray-400"
                   data-ocid="audit-log.empty_state"
                 >
@@ -323,6 +328,12 @@ export default function AuditLogPage({ user }: AuditLogPageProps) {
                     i % 2 === 0 ? "" : "bg-gray-50/30"
                   }`}
                 >
+                  <td
+                    className="py-2.5 px-3 text-center text-xs text-gray-500 font-medium"
+                    style={{ width: 52 }}
+                  >
+                    {i + 1}
+                  </td>
                   <td className="py-2.5 px-4 text-xs text-gray-500 whitespace-nowrap">
                     {formatTime(entry.timestamp)}
                   </td>

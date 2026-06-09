@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/select";
 import { Save, Search } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { onStorageChange, storage } from "../data/storage-api";
+import { onStorageChange, storage } from "../data/storage";
 import type { Billing } from "../types";
 
 export default function OutwardBillingPage() {
@@ -120,6 +120,12 @@ export default function OutwardBillingPage() {
         <table className="w-full text-sm">
           <thead style={{ background: "var(--theme-primary, #6B1A2B)" }}>
             <tr>
+              <th
+                className="text-center py-3 px-3 text-white font-medium text-xs"
+                style={{ width: 52 }}
+              >
+                Sr.No.
+              </th>
               {[
                 "Client",
                 "PAN",
@@ -142,18 +148,24 @@ export default function OutwardBillingPage() {
           <tbody>
             {rows.length === 0 && (
               <tr>
-                <td colSpan={8} className="py-8 text-center text-gray-400">
+                <td colSpan={9} className="py-8 text-center text-gray-400">
                   No clients found
                 </td>
               </tr>
             )}
-            {rows.map(({ client, billing }) => {
+            {rows.map(({ client, billing }, _i) => {
               const val = getVal(client.id, billing);
               return (
                 <tr
                   key={client.id}
                   className="border-b last:border-0 hover:bg-gray-50"
                 >
+                  <td
+                    className="py-2 px-3 text-center text-xs text-gray-500 font-medium"
+                    style={{ width: 52 }}
+                  >
+                    {_i + 1}
+                  </td>
                   <td className="py-2 px-4 font-medium">{client.name}</td>
                   <td className="py-2 px-4 font-mono text-xs">{client.pan}</td>
                   <td className="py-2 px-4">{client.taxYear}</td>

@@ -37,7 +37,7 @@ import {
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
-import { onStorageChange, storage } from "../data/storage-api";
+import { onStorageChange, storage } from "../data/storage";
 import type { NotificationLog, User, WhatsAppSettings } from "../types";
 
 const DEFAULT_SETTINGS: WhatsAppSettings = {

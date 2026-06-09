@@ -4,12 +4,14 @@ import { Label } from "@/components/ui/label";
 import { Eye, EyeOff } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import {
+  clearMigrationFlag,
   onStorageChange,
   refreshFromCanister,
+  runFirmDataRecovery,
   saveUserDatabaseNow,
   storage,
   whenInitialized,
-} from "../data/storage-api";
+} from "../data/storage";
 import type { FirmAccount, User } from "../types";
 
 interface LoginPageProps {
@@ -326,12 +328,11 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
       }
     }
 
-    // Check immediately
+    // Check immediately (in case storage was updated since checkingAdmin resolved)
     recheckAdmin();
 
-    // Only subscribe to storage changes (no polling on login page)
+    // Also subscribe to any future storage changes (from 5-second background sync)
     const unsub = onStorageChange(recheckAdmin);
-    
     return unsub;
   }, [checkingAdmin, view]);
 
@@ -404,6 +405,8 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
           storage.updateFirmLastLogin(user.firmOwnerId);
         }
         onLogin(user);
+        clearMigrationFlag();
+        runFirmDataRecovery().catch(() => {});
       } else {
         setLoginError("Invalid email or password.");
       }
@@ -530,8 +533,9 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
       return;
     }
 
+    const ownerId = storage.uid();
     const newOwner: User = {
-      id: storage.uid(),
+      id: ownerId,
       email: ownerEmail.trim(),
       password: ownerPassword,
       name: ownerName.trim(),
@@ -539,11 +543,15 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
       role: "Owner",
       isActive: true,
       accessType: "Trial",
+      firmId: ownerId,
     };
     storage.saveUsers([...users, newOwner]);
 
     // Also create a matching FirmAccount so the owner appears in the Super Admin panel
     const existingFirms = storage.getFirmAccounts();
+    // Assign next sequential firmNumber: TaxCore_001, TaxCore_002, …
+    const nextSeq = existingFirms.length + 1;
+    const firmNumber = `TaxCore_${String(nextSeq).padStart(3, "0")}`;
     const newFirmAccount: FirmAccount = {
       id: newOwner.id,
       ownerName: ownerName.trim(),
@@ -554,6 +562,7 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
       isActive: true,
       createdAt: new Date().toISOString(),
       clientCount: 0,
+      firmNumber,
     };
     storage.saveFirmAccounts([...existingFirms, newFirmAccount]);
 
@@ -1702,6 +1711,17 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
         >
           Secure &bull; Multi-tenant &bull; Role-based access
         </p>
+        <span
+          className="mt-1.5 text-xs font-mono px-2 py-0.5 rounded"
+          style={{
+            background: "rgba(139,26,26,0.07)",
+            color: "#A05858",
+            border: "1px solid rgba(139,26,26,0.15)",
+          }}
+          data-ocid="login.version_label"
+        >
+          TaxCore v84
+        </span>
       </footer>
     </div>
   );

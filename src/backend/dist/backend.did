@@ -1,16 +1,125 @@
+type WriteResult = 
+ record {
+   message: text;
+   ok: bool;
+ };
+type WriteContext = 
+ record {
+   firmId: FirmId;
+   role: text;
+   userId: text;
+ };
 type UserRole = 
  variant {
    admin;
    guest;
    user;
  };
+type ScanResult = 
+ record {
+   assigned: nat;
+   hadFirmId: nat;
+   message: text;
+   missingFirmId: nat;
+   ok: bool;
+   perFirmDetails: vec FirmAssignmentDetail;
+   skipped: bool;
+   totalRecordsScanned: nat;
+   unmatched: nat;
+ };
+type MigrationResult = 
+ record {
+   message: text;
+   ok: bool;
+   orphanedCount: nat;
+   perFirmCounts: vec FirmMigrationCount;
+   skipped: bool;
+   totalRecords: nat;
+ };
+type FirmSummary = 
+ record {
+   clientCount: nat;
+   firmId: FirmId;
+   firmName: text;
+   firmNumber: text;
+   lastLogin: int;
+   ownerEmail: text;
+   ownerMobile: text;
+   ownerName: text;
+   planType: text;
+   status: text;
+ };
+type FirmMigrationCount = 
+ record {
+   firmId: FirmId;
+   firmNumber: text;
+   recordCount: nat;
+ };
+type FirmId = text;
+type FirmAssignmentDetail = 
+ record {
+   assigned: nat;
+   firmId: FirmId;
+   firmNumber: text;
+ };
 service : {
   _initializeAccessControl: () -> ();
   assignCallerUserRole: (user: principal, role: UserRole) -> ();
+  backfillFirmNumbers: () -> (nat);
+  forceRecoverFirmData: (adminRole: text, targetFirmId: FirmId,
+   appDataPayload: text, recordCount: nat) -> (WriteResult);
+  getActiveFirmAppData: (firmId: FirmId, role: text) -> (text);
+  getAllFirmSummaries: (adminRole: text) -> (vec FirmSummary);
+  getAutoAssignStatus: () ->
+   (record {
+      adminFirmId: text;
+      autoAssignRan: bool;
+      autoAssignVersion: nat;
+      migratedRecords: nat;
+    }) query;
   getCallerUserRole: () -> (UserRole) query;
+  getFirmAppData: (firmId: FirmId, role: text) -> (text);
+  getFirmAppDataCount: () -> (nat) query;
+  getFirmUserData: (firmId: FirmId, role: text) -> (text);
   getGlobalAppData: () -> (text) query;
   getGlobalUserDatabase: () -> (text) query;
+  getMigrationStatus: () ->
+   (record {
+      adminFirmId: text;
+      autoAssignRan: bool;
+      autoAssignVersion: nat;
+      migrated: bool;
+      migratedRecords: nat;
+      migrationVersion: nat;
+    }) query;
+  getMigrationVersion: () -> (nat) query;
+  getNextFirmNumber: (firmId: FirmId) -> (text);
   isCallerAdmin: () -> (bool) query;
+  migrateExistingDataToAdminFirm: (adminFirmId: FirmId, existingAppData:
+   text, existingUserDb: text) -> (WriteResult);
+  migratePreIsolationData: (adminRole: text, adminFirmId: FirmId,
+   firmPartitions: vec record {
+                         FirmId;
+                         text;
+                       }, orphanedAppData: text, orphanedCount: nat,
+   auditEntry: text) -> (MigrationResult);
+  needsAutoAssign: () -> (bool) query;
+  peekNextFirmNumber: () -> (text) query;
+  registerFirm: (firmId: FirmId, firmName: text, ownerName: text, ownerEmail:
+   text, ownerMobile: text) -> (WriteResult);
+  resetAutoAssign: (adminRole: text) -> (WriteResult);
+  saveFirmAppData: (ctx: WriteContext, payload: text) -> (WriteResult);
+  saveFirmUserData: (ctx: WriteContext, payload: text) -> (WriteResult);
   saveGlobalAppData: (json: text) -> ();
   saveGlobalUserDatabase: (json: text) -> ();
+  scanAndAutoAssignFirmIds: (adminRole: text, adminFirmId: FirmId,
+   firmPartitions: vec record {
+                         FirmId;
+                         text;
+                         nat;
+                       }, orphanedPayload: text, totalScanned: nat,
+   hadFirmId: nat, missingFirmId: nat, unmatched: nat, force: bool) ->
+   (ScanResult);
+  updateFirmPlan: (adminRole: text, targetFirmId: FirmId, planType: text,
+   status: text) -> (WriteResult);
 }

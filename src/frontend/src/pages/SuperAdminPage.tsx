@@ -32,7 +32,7 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useTheme } from "../contexts/ThemeContext";
-import { onStorageChange, saveUsersNow, storage } from "../data/storage-api";
+import { onStorageChange, saveUsersNow, storage } from "../data/storage";
 import type { AuditLogEntry, FirmAccount, User } from "../types";
 
 const ADMIN_PROFILE_COMPLETE_KEY = "taxcore_admin_profile_complete";
@@ -122,7 +122,8 @@ function FirmDetailsModal({
       u.email.toLowerCase() === firm.email.toLowerCase() && u.role === "Owner",
   );
   const totalClients = clients.filter(
-    (c) => ownerUser && c.createdBy === ownerUser.id,
+    (c) =>
+      ownerUser && (c.firmId === ownerUser.id || c.createdBy === ownerUser.id),
   ).length;
   const totalStaff = ownerUser
     ? users.filter((u) => u.firmOwnerId === ownerUser.id && u.role === "Staff")
@@ -145,6 +146,17 @@ function FirmDetailsModal({
           <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-700 flex items-center gap-1.5">
             🔒 Firm name is locked and cannot be changed after creation.
           </div>
+          {/* Firm ID — read-only, prominent */}
+          {firm.firmNumber && (
+            <div className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 flex items-center justify-between">
+              <span className="text-xs text-blue-600 uppercase tracking-wide font-semibold">
+                Firm ID
+              </span>
+              <span className="font-mono font-bold text-blue-800 text-sm tracking-wider">
+                {firm.firmNumber}
+              </span>
+            </div>
+          )}
           <div className="grid grid-cols-2 gap-3 text-sm">
             <div>
               <span className="text-xs text-gray-400 uppercase tracking-wide">
@@ -297,7 +309,6 @@ export default function SuperAdminPage() {
   const [savingProfile, setSavingProfile] = useState(false);
 
   // Re-check profile completeness when adminUser changes (e.g. after canister sync)
-  // biome-ignore lint/correctness/useExhaustiveDependencies: intentional — only check when adminUser identity changes
   useEffect(() => {
     if (!profileSetupDone) {
       const done =
@@ -442,7 +453,13 @@ export default function SuperAdminPage() {
         u.role === "Owner",
     );
     if (!ownerUser) return 0;
-    return clients.filter((c) => c.createdBy === ownerUser.id).length;
+    const firmId = (ownerUser as any).firmId ?? ownerUser.id;
+    return clients.filter(
+      (c) =>
+        c.firmId === firmId ||
+        c.firmId === ownerUser.id ||
+        c.createdBy === ownerUser.id,
+    ).length;
   }
 
   // ─── Handlers ────────────────────────────────────────────────────────────────
@@ -833,6 +850,7 @@ export default function SuperAdminPage() {
               <tr>
                 {[
                   "Firm Name",
+                  "Firm ID",
                   "Owner Name",
                   "Email",
                   "Mobile",
@@ -870,6 +888,15 @@ export default function SuperAdminPage() {
                           {f.firmName}
                         </span>
                       </div>
+                    </td>
+                    <td className="py-3 px-4 whitespace-nowrap">
+                      {f.firmNumber ? (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-mono font-semibold bg-blue-50 text-blue-700 border border-blue-100">
+                          {f.firmNumber}
+                        </span>
+                      ) : (
+                        <span className="text-xs text-gray-400 italic">—</span>
+                      )}
                     </td>
                     <td className="py-3 px-4 whitespace-nowrap">
                       {f.ownerName}

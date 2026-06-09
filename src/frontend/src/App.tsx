@@ -5,10 +5,11 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import {
   initialize,
   lastSyncTime,
+  runPreIsolationMigration,
   seedData,
   silentRefreshFromCanister,
   storage,
-} from "./data/storage-api";
+} from "./data/storage";
 import type { Client, Page, User } from "./types";
 
 // Lazy load all pages for faster initial load
@@ -20,10 +21,10 @@ const WorkProcessingPage = lazy(() => import("./pages/WorkProcessingPage"));
 const OutwardBillingPage = lazy(() => import("./pages/OutwardBillingPage"));
 const UserManagementPage = lazy(() => import("./pages/UserManagementPage"));
 const ExportPage = lazy(() => import("./pages/ExportPage"));
-const ImportPage = lazy(() => import("./pages/ImportPage"));
 const SuperAdminPage = lazy(() => import("./pages/SuperAdminPage"));
 const AuditLogPage = lazy(() => import("./pages/AuditLogPage"));
 const SettingsPage = lazy(() => import("./pages/SettingsPage"));
+const ImportHistoryPage = lazy(() => import("./pages/ImportHistoryPage"));
 
 function PageFallback() {
   return (
@@ -89,8 +90,9 @@ export default function App() {
 
   // Initialize storage from canister on mount
   useEffect(() => {
-    initialize()
-      .then(() => {
+    const init = async () => {
+      try {
+        await initialize();
         // After canister load, refresh current user from storage
         // (in case users array was updated from canister)
         const currentUser = storage.getCurrentUser();
@@ -103,43 +105,33 @@ export default function App() {
             storage.setCurrentUser(freshUser);
           }
         }
-        setStorageReady(true);
-      })
-      .catch(() => {
+        // Run pre-isolation migration for Administrator
+        const activeUser = storage.getCurrentUser();
+        if (activeUser?.role === "Super Admin") {
+          try {
+            await runPreIsolationMigration();
+          } catch (e) {
+            console.error("Migration failed", e);
+          }
+        }
+      } catch {
         // Even if canister load fails, show app with localStorage data
+      } finally {
         setStorageReady(true);
-      });
-  }, []);
-
-  // Auto-refresh from backend every 1 second when logged in (real-time sync)
-  // Optimized: pauses when tab is hidden to save resources
-  // biome-ignore lint/correctness/useExhaustiveDependencies: user.id is the stable identity key
-  useEffect(() => {
-    if (!user) return;
-    
-    let isActive = true;
-    
-    // Pause polling when tab is hidden
-    const handleVisibilityChange = () => {
-      isActive = !document.hidden;
-      if (isActive) {
-        silentRefreshFromCanister().catch(() => {});
       }
     };
-    
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    
+    init();
+  }, []);
+
+  // Auto-refresh from canister every 30 seconds when logged in
+  useEffect(() => {
+    if (!user) return;
     // Immediately sync on login
     silentRefreshFromCanister().catch(() => {});
     const interval = setInterval(() => {
-      if (isActive) {
-        silentRefreshFromCanister().catch(() => {});
-      }
-    }, 1_000); // 1 second for real-time sync
-    return () => {
-      clearInterval(interval);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
+      silentRefreshFromCanister().catch(() => {});
+    }, 5_000);
+    return () => clearInterval(interval);
   }, [user]);
 
   useEffect(() => {
@@ -250,9 +242,13 @@ export default function App() {
           </div>
         );
       case "export":
-        return <ExportPage />;
-      case "import":
-        return <ImportPage />;
+        return (
+          <ExportPage
+            onNavigateToImportHistory={() => handleNavigate("import-history")}
+          />
+        );
+      case "import-history":
+        return <ImportHistoryPage onBack={() => handleNavigate("export")} />;
       case "audit-log":
         return <AuditLogPage user={user} />;
       case "settings":

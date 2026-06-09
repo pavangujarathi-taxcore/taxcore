@@ -10,18 +10,130 @@ import type { ActorMethod } from '@icp-sdk/core/agent';
 import type { IDL } from '@icp-sdk/core/candid';
 import type { Principal } from '@icp-sdk/core/principal';
 
+export interface FirmAssignmentDetail {
+  'assigned' : bigint,
+  'firmNumber' : string,
+  'firmId' : FirmId,
+}
+export type FirmId = string;
+export interface FirmMigrationCount {
+  'firmNumber' : string,
+  'firmId' : FirmId,
+  'recordCount' : bigint,
+}
+export interface FirmSummary {
+  'ownerEmail' : string,
+  'status' : string,
+  'ownerName' : string,
+  'firmNumber' : string,
+  'clientCount' : bigint,
+  'firmName' : string,
+  'firmId' : FirmId,
+  'lastLogin' : bigint,
+  'planType' : string,
+  'ownerMobile' : string,
+}
+export interface MigrationResult {
+  'ok' : boolean,
+  'perFirmCounts' : Array<FirmMigrationCount>,
+  'skipped' : boolean,
+  'message' : string,
+  'orphanedCount' : bigint,
+  'totalRecords' : bigint,
+}
+export interface ScanResult {
+  'ok' : boolean,
+  'totalRecordsScanned' : bigint,
+  'assigned' : bigint,
+  'skipped' : boolean,
+  'hadFirmId' : bigint,
+  'missingFirmId' : bigint,
+  'unmatched' : bigint,
+  'message' : string,
+  'perFirmDetails' : Array<FirmAssignmentDetail>,
+}
 export type UserRole = { 'admin' : null } |
   { 'user' : null } |
   { 'guest' : null };
+export interface WriteContext {
+  'userId' : string,
+  'role' : string,
+  'firmId' : FirmId,
+}
+export interface WriteResult { 'ok' : boolean, 'message' : string }
 export interface _SERVICE {
   '_initializeAccessControl' : ActorMethod<[], undefined>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
+  'backfillFirmNumbers' : ActorMethod<[], bigint>,
+  'forceRecoverFirmData' : ActorMethod<
+    [string, FirmId, string, bigint],
+    WriteResult
+  >,
+  'getActiveFirmAppData' : ActorMethod<[FirmId, string], string>,
+  'getAllFirmSummaries' : ActorMethod<[string], Array<FirmSummary>>,
+  'getAutoAssignStatus' : ActorMethod<
+    [],
+    {
+      'migratedRecords' : bigint,
+      'autoAssignVersion' : bigint,
+      'autoAssignRan' : boolean,
+      'adminFirmId' : string,
+    }
+  >,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
+  'getFirmAppData' : ActorMethod<[FirmId, string], string>,
+  'getFirmAppDataCount' : ActorMethod<[], bigint>,
+  'getFirmUserData' : ActorMethod<[FirmId, string], string>,
   'getGlobalAppData' : ActorMethod<[], string>,
   'getGlobalUserDatabase' : ActorMethod<[], string>,
+  'getMigrationStatus' : ActorMethod<
+    [],
+    {
+      'migratedRecords' : bigint,
+      'autoAssignVersion' : bigint,
+      'migrated' : boolean,
+      'autoAssignRan' : boolean,
+      'migrationVersion' : bigint,
+      'adminFirmId' : string,
+    }
+  >,
+  'getMigrationVersion' : ActorMethod<[], bigint>,
+  'getNextFirmNumber' : ActorMethod<[FirmId], string>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
+  'migrateExistingDataToAdminFirm' : ActorMethod<
+    [FirmId, string, string],
+    WriteResult
+  >,
+  'migratePreIsolationData' : ActorMethod<
+    [string, FirmId, Array<[FirmId, string]>, string, bigint, string],
+    MigrationResult
+  >,
+  'needsAutoAssign' : ActorMethod<[], boolean>,
+  'peekNextFirmNumber' : ActorMethod<[], string>,
+  'registerFirm' : ActorMethod<
+    [FirmId, string, string, string, string],
+    WriteResult
+  >,
+  'resetAutoAssign' : ActorMethod<[string], WriteResult>,
+  'saveFirmAppData' : ActorMethod<[WriteContext, string], WriteResult>,
+  'saveFirmUserData' : ActorMethod<[WriteContext, string], WriteResult>,
   'saveGlobalAppData' : ActorMethod<[string], undefined>,
   'saveGlobalUserDatabase' : ActorMethod<[string], undefined>,
+  'scanAndAutoAssignFirmIds' : ActorMethod<
+    [
+      string,
+      FirmId,
+      Array<[FirmId, string, bigint]>,
+      string,
+      bigint,
+      bigint,
+      bigint,
+      bigint,
+      boolean,
+    ],
+    ScanResult
+  >,
+  'updateFirmPlan' : ActorMethod<[string, FirmId, string, string], WriteResult>,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];

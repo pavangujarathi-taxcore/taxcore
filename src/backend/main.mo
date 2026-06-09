@@ -4,7 +4,13 @@ import Text "mo:core/Text";
 
 import AccessControl "mo:caffeineai-authorization/access-control";
 import MixinAuthorization "mo:caffeineai-authorization/MixinAuthorization";
+import FirmIsolationTypes "types/firm-isolation";
+import FirmIsolationMixin "mixins/firm-isolation-api";
+import Migration "migration";
 
+
+
+(with migration = Migration.run)
 actor {
 
   // ─── Legacy stable variables (kept for upgrade compatibility) ─────────────
@@ -14,6 +20,13 @@ actor {
 
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
+  // ─── Firm-isolation state ────────────────────────────────────────────────────
+  let firmAppData    = Map.empty<FirmIsolationTypes.FirmId, Text>();
+  let firmUserData   = Map.empty<FirmIsolationTypes.FirmId, Text>();
+  let firmRegistry   = Map.empty<FirmIsolationTypes.FirmId, FirmIsolationTypes.FirmSummary>();
+  let migState       = FirmIsolationTypes.initMigrationState();
+  let firmNumState   = FirmIsolationTypes.initFirmNumberState();
+  include FirmIsolationMixin(firmAppData, firmUserData, firmRegistry, migState, firmNumState);
 
   public type UserProfile = {
     name : Text;

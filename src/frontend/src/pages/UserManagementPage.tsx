@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Crown, Eye, EyeOff, Plus, Trash2, UserCheck } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { onStorageChange, saveUsersNow, storage } from "../data/storage-api";
+import { onStorageChange, saveUsersNow, storage } from "../data/storage";
 import type { User } from "../types";
 
 function isValidEmail(v: string): boolean {
@@ -41,9 +41,11 @@ export default function UserManagementPage() {
       (u) => u.role === "Owner" || u.role === "Staff",
     );
     const ownerUser = visible.find((u) => u.role === "Owner") || null;
-    const staffUsers = visible.filter((u) => u.role === "Staff");
+    const staffUsers = visible.filter(
+      (u) => u.role === "Staff" && u.firmOwnerId === currentUser?.id,
+    );
     return { ownerUser, staffUsers };
-  }, [refreshKey]);
+  }, [refreshKey, currentUser?.id]);
 
   // All visible users for duplicate check
   const allUsers = useMemo(() => {
@@ -82,6 +84,7 @@ export default function UserManagementPage() {
       role: "Staff",
       isActive: true,
       firmOwnerId: currentUser?.id, // links staff to this owner
+      firmId: currentUser?.firmId ?? currentUser?.id,
     };
     const updatedUsers = [...allUsers, newUser];
     // Immediately write to canister (awaited) so other devices see the new staff

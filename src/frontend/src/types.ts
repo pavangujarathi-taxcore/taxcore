@@ -16,6 +16,8 @@ export interface User {
   isActive?: boolean; // for Owner accounts controlled by Super Admin
   accessType?: "Trial" | "Full"; // for Owner accounts
   firmOwnerId?: string; // for Staff: the ID of the Owner who created them
+  /** Firm this user belongs to. Same as Owner's id for Owner; inherited for Staff. */
+  firmId?: string;
 }
 
 export interface FirmAccount {
@@ -29,6 +31,8 @@ export interface FirmAccount {
   createdAt: string;
   clientCount: number;
   lastLogin?: string; // ISO date string, updated on each Owner/Staff login
+  /** Sequential firm number, e.g. TaxCore_001, TaxCore_002 */
+  firmNumber?: string;
 }
 
 export interface Client {
@@ -53,6 +57,8 @@ export interface Client {
   clientCategory: string; // auto from PAN
   createdAt: string;
   createdBy: string;
+  /** Firm this client belongs to — matches the Owner's firmId */
+  firmId?: string;
 }
 
 export interface DocumentInward {
@@ -63,6 +69,8 @@ export interface DocumentInward {
   status: "Complete" | "Partial";
   remarks: string;
   createdAt: string;
+  /** Firm this document belongs to */
+  firmId?: string;
 }
 
 export interface WorkProcessing {
@@ -78,6 +86,8 @@ export interface WorkProcessing {
   updatedAt: string;
   eVerified?: boolean; // backward compat stop-gate
   filingStatus?: "Pending" | "Pending for E-verification" | "E-Verified";
+  /** Firm this work record belongs to */
+  firmId?: string;
 }
 
 export interface Billing {
@@ -89,6 +99,8 @@ export interface Billing {
   balance: number; // auto = billAmount - receipt
   outwardStatus: "Pending" | "Ready";
   updatedAt: string;
+  /** Firm this billing record belongs to */
+  firmId?: string;
 }
 
 export interface AuditLogEntry {
@@ -103,6 +115,27 @@ export interface AuditLogEntry {
   oldValue: string;
   newValue: string;
   timestamp: string;
+  /** Firm this audit entry belongs to — entries remain scoped to originating firm */
+  firmId?: string;
+}
+
+export interface ImportHistoryEntry {
+  id: string;
+  importedAt: string; // ISO timestamp
+  mode: "Merge" | "Replace";
+  importedBy: string; // username
+  tabCounts: {
+    clients: { added: number; updated: number; skipped: number };
+    workProcessing: { added: number; updated: number; skipped: number };
+    documentInward: { added: number; updated: number; skipped: number };
+    billing: { added: number; updated: number; skipped: number };
+  };
+  changedRows: {
+    clients: Client[];
+    workProcessing: WorkProcessing[];
+    documentInward: DocumentInward[];
+    billing: Billing[];
+  };
 }
 
 export interface WhatsAppSettings {
@@ -123,6 +156,8 @@ export interface NotificationLog {
   event: string; // "Due Date Alert" | "Filing Status" | "Document Ready"
   status: "Pending" | "Sent" | "Failed";
   timestamp: string;
+  /** Firm this notification belongs to */
+  firmId?: string;
 }
 
 export type Page =
@@ -133,7 +168,7 @@ export type Page =
   | "billing"
   | "user-management"
   | "export"
-  | "import"
+  | "import-history"
   | "super-admin"
   | "audit-log"
   | "settings";
@@ -147,8 +182,8 @@ export function getHeadOfIncome(client: Client): string {
   return legacy || "Salaried";
 }
 
-// Theme system - 4 Premium Themes
-export type ThemeKey = "burgundy" | "yellow" | "sky" | "purple";
+// Theme system
+export type ThemeKey = "burgundy" | "yellow" | "navy" | "forestgreen";
 
 export interface ThemeConfig {
   key: ThemeKey;
@@ -182,10 +217,10 @@ export const THEMES: Record<ThemeKey, ThemeConfig> = {
   burgundy: {
     key: "burgundy",
     label: "Linen & Burgundy",
-    primary: "#A05858",           // More soothing, lighter burgundy
-    primaryLight: "rgba(160,88,88,0.06)",
-    gold: "#F0E4D0",              // Warm linen/cream color
-    activeHighlight: "rgba(240,228,208,0.12)",
+    primary: "#A05858",
+    primaryLight: "rgba(160,88,88,0.10)",
+    gold: "#F0E4D0",
+    activeHighlight: "rgba(240,228,208,0.22)",
     subtitle: "#F0E4D0",
     logoIconBg: "#F0E4D0",
     logoIconText: "#A05858",
@@ -198,10 +233,10 @@ export const THEMES: Record<ThemeKey, ThemeConfig> = {
   yellow: {
     key: "yellow",
     label: "Premium Gold",
-    primary: "#6B6B3A",            // Rich, premium olive
-    primaryLight: "rgba(107,107,58,0.06)",
-    gold: "#E6D899",               // Luxurious champagne gold
-    activeHighlight: "rgba(230,216,153,0.12)",
+    primary: "#6B6B3A",
+    primaryLight: "rgba(107,107,58,0.10)",
+    gold: "#E6D899",
+    activeHighlight: "rgba(230,216,153,0.22)",
     subtitle: "#E6D899",
     logoIconBg: "#E6D899",
     logoIconText: "#6B6B3A",
@@ -211,36 +246,36 @@ export const THEMES: Record<ThemeKey, ThemeConfig> = {
     avatarText: "#6B6B3A",
     pageTitleColor: "#6B6B3A",
   },
-  sky: {
-    key: "sky",
+  navy: {
+    key: "navy",
     label: "Sky Blue",
-    primary: "#3B9FD9",            // Fresh sky blue
-    primaryLight: "rgba(59,159,217,0.06)",
-    gold: "#62BFED",               // Bright sky accent
-    activeHighlight: "rgba(98,191,237,0.12)",
-    subtitle: "#8DD4F5",
+    primary: "#3B9FD9",
+    primaryLight: "rgba(59,159,217,0.10)",
+    gold: "#62BFED",
+    activeHighlight: "rgba(98,191,237,0.22)",
+    subtitle: "#FFFFFF",
     logoIconBg: "#62BFED",
     logoIconText: "#FFFFFF",
-    activeNavText: "#8DD4F5",
+    activeNavText: "#FFFFFF",
     activeNavBorder: "#62BFED",
     avatarBg: "#62BFED",
     avatarText: "#FFFFFF",
     pageTitleColor: "#3B9FD9",
   },
-  purple: {
-    key: "purple",
+  forestgreen: {
+    key: "forestgreen",
     label: "Royal Purple",
-    primary: "#6B5B95",            // Rich royal purple
-    primaryLight: "rgba(107,91,149,0.06)",
-    gold: "#C5B8E0",               // Soft lavender accent
-    activeHighlight: "rgba(197,184,224,0.12)",
-    subtitle: "#D6CDEB",
+    primary: "#6B5B95",
+    primaryLight: "rgba(107,91,149,0.10)",
+    gold: "#C5B8E0",
+    activeHighlight: "rgba(197,184,224,0.22)",
+    subtitle: "#FFFFFF",
     logoIconBg: "#C5B8E0",
-    logoIconText: "#FFFFFF",
-    activeNavText: "#D6CDEB",
+    logoIconText: "#6B5B95",
+    activeNavText: "#FFFFFF",
     activeNavBorder: "#C5B8E0",
     avatarBg: "#C5B8E0",
-    avatarText: "#FFFFFF",
+    avatarText: "#6B5B95",
     pageTitleColor: "#6B5B95",
   },
 };

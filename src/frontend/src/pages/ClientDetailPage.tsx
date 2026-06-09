@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import DatePickerInput from "../components/DatePickerInput";
-import { getPanCategory, parseDDMMYYYY, storage } from "../data/storage-api";
+import { getPanCategory, parseDDMMYYYY, storage } from "../data/storage";
 import type { Client, DocumentInward, WorkProcessing } from "../types";
 import { getHeadOfIncome } from "../types";
 

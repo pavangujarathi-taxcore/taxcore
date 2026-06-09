@@ -1,7 +1,11 @@
 import { Button } from "@/components/ui/button";
-import { Download, FileSpreadsheet } from "lucide-react";
-import { storage } from "../data/storage-api";
+import { Download, FileSpreadsheet, History } from "lucide-react";
+import { storage } from "../data/storage";
 import { getHeadOfIncome } from "../types";
+
+interface ExportPageProps {
+  onNavigateToImportHistory?: () => void;
+}
 
 function escapeCell(val: unknown): string {
   const str = val == null ? "" : String(val);
@@ -29,7 +33,9 @@ function downloadBlob(content: string, filename: string, mimeType: string) {
   URL.revokeObjectURL(url);
 }
 
-export default function ExportPage() {
+export default function ExportPage({
+  onNavigateToImportHistory,
+}: ExportPageProps) {
   const getDateStr = () =>
     new Date().toLocaleDateString("en-IN").replace(/\//g, "-");
 
@@ -84,6 +90,7 @@ export default function ExportPage() {
 
     // === CLIENT MASTER ===
     const clientHeaders = [
+      "Sr.No.",
       "Name",
       "PAN",
       "Head of Income",
@@ -96,7 +103,8 @@ export default function ExportPage() {
       "Email",
       "Created At",
     ];
-    const clientRows = clients.map((c) => ({
+    const clientRows = clients.map((c, idx) => ({
+      "Sr.No.": idx + 1,
       Name: c.name,
       PAN: c.pan,
       "Head of Income": getHOI(c),
@@ -364,6 +372,7 @@ export default function ExportPage() {
   const handleExportClients = () => {
     const clients = storage.getClients();
     const headers = [
+      "Sr.No.",
       "Name",
       "PAN",
       "Head of Income",
@@ -371,10 +380,12 @@ export default function ExportPage() {
       "Category",
       "Tax Year",
       "Due Date",
+      "Client Type",
       "Mobile",
       "Email",
     ];
-    const rows = clients.map((c) => ({
+    const rows = clients.map((c, idx) => ({
+      "Sr.No.": idx + 1,
       Name: c.name,
       PAN: c.pan,
       "Head of Income": getHeadOfIncome(c as any),
@@ -382,6 +393,7 @@ export default function ExportPage() {
       Category: c.clientCategory,
       "Tax Year": c.taxYear,
       "Due Date": c.dueDate,
+      "Client Type": c.clientType,
       Mobile: c.mobile,
       Email: c.email || "-",
     })) as Record<string, unknown>[];
@@ -506,17 +518,35 @@ export default function ExportPage() {
 
   return (
     <div className="space-y-6 max-w-2xl">
-      <div>
-        <h2
-          className="text-lg font-semibold mb-1"
-          style={{ color: "var(--theme-primary, #6B1A2B)" }}
-        >
-          Export Data
-        </h2>
-        <p className="text-sm text-gray-500">
-          Download your TaxCore data as CSV files. Full export includes
-          head-of-income grouped sheets.
-        </p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h2
+            className="text-lg font-semibold mb-1"
+            style={{ color: "var(--theme-primary, #6B1A2B)" }}
+          >
+            Export Data
+          </h2>
+          <p className="text-sm text-gray-500">
+            Download your TaxCore data as CSV files. Full export includes
+            head-of-income grouped sheets.
+          </p>
+        </div>
+        {onNavigateToImportHistory && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onNavigateToImportHistory}
+            className="flex-shrink-0 gap-2"
+            style={{
+              borderColor: "var(--theme-primary, #6B1A2B)",
+              color: "var(--theme-primary, #6B1A2B)",
+            }}
+            data-ocid="export.import_history_button"
+          >
+            <History className="w-4 h-4" />
+            Import History
+          </Button>
+        )}
       </div>
 
       <div className="space-y-3">

@@ -22,13 +22,16 @@ import {
   Plus,
   Search,
   Trash2,
+  Upload,
   X,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import DatePickerInput from "../components/DatePickerInput";
+import ExcelImportDialog from "../components/ExcelImportDialog";
 import InlineStatusCell from "../components/InlineStatusCell";
 import {
+  forceSyncToCanister,
   getHeadOfIncome as getClientHeadOfIncome,
   getClientWork,
   getDaysUntilDue,
@@ -38,7 +41,8 @@ import {
   getPanCategory,
   onStorageChange,
   storage,
-} from "../data/storage-api";
+  tombstoneDeletedClients,
+} from "../data/storage";
 import type { Client, WorkProcessing } from "../types";
 import { getCurrentTaxYear, getTaxYears } from "../utils/taxYears";
 
@@ -105,6 +109,9 @@ export default function ClientMasterPage({
   const [alertDismissed, setAlertDismissed] = useState(false);
   const [alertClients, setAlertClients] = useState(() => getDueAlertClients());
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+
+  // --- Import state -----------------------------------------------------------
+  const [importOpen, setImportOpen] = useState(false);
 
   useEffect(() => {
     setAlertClients(getDueAlertClients());
@@ -328,15 +335,24 @@ export default function ClientMasterPage({
     setRefreshKey((k) => k + 1);
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (!confirm("Delete this client and all related data?")) return;
     const deletedClient = storage.getClients().find((c) => c.id === id);
+
+    // Register tombstone FIRST so the AppData snapshot written to canister
+    // includes it and silentRefreshFromCanister on other devices can filter it out.
+    tombstoneDeletedClients([id]);
+
+    // Build a single composite post-deletion snapshot synchronously.
+    // All four arrays are updated in cache + localStorage atomically before
+    // any bgSync fires, eliminating multiple competing bgSync events.
     storage.saveClients(storage.getClients().filter((c) => c.id !== id));
     storage.saveWork(storage.getWork().filter((w) => w.clientId !== id));
     storage.saveDocuments(
       storage.getDocuments().filter((d) => d.clientId !== id),
     );
     storage.saveBilling(storage.getBilling().filter((b) => b.clientId !== id));
+
     if (deletedClient) {
       storage.addAuditLog({
         id: storage.uid(),
@@ -352,6 +368,16 @@ export default function ClientMasterPage({
         timestamp: new Date().toISOString(),
       });
     }
+
+    // Force-flush the complete post-deletion state to the canister (awaited).
+    // forceSyncToCanister sets the write-lock so any concurrent
+    // silentRefreshFromCanister poll skips overwriting cache.clients.
+    try {
+      await forceSyncToCanister();
+    } catch (err) {
+      console.warn("[handleDelete] forceSyncToCanister failed:", err);
+    }
+
     setRefreshKey((k) => k + 1);
   };
 
@@ -525,14 +551,28 @@ export default function ClientMasterPage({
             </SelectContent>
           </Select>
         </div>
-        <Button
-          onClick={openAdd}
-          style={{ background: "var(--theme-primary, #6B1A2B)" }}
-          className="text-white"
-          data-ocid="clients.primary_button"
-        >
-          <Plus className="w-4 h-4 mr-1" /> Add Client
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={() => setImportOpen(true)}
+            className="text-sm"
+            style={{
+              borderColor: "var(--theme-primary, #6B1A2B)",
+              color: "var(--theme-primary, #6B1A2B)",
+            }}
+            data-ocid="clients.import_button"
+          >
+            <Upload className="w-4 h-4 mr-1" /> Import Excel
+          </Button>
+          <Button
+            onClick={openAdd}
+            style={{ background: "var(--theme-primary, #6B1A2B)" }}
+            className="text-white"
+            data-ocid="clients.primary_button"
+          >
+            <Plus className="w-4 h-4 mr-1" /> Add Client
+          </Button>
+        </div>
       </div>
 
       {/* Table */}
@@ -543,6 +583,12 @@ export default function ClientMasterPage({
         <table className="w-full text-sm">
           <thead style={{ background: "var(--theme-primary, #6B1A2B)" }}>
             <tr>
+              <th
+                className="text-center py-3 px-3 text-white font-medium text-xs"
+                style={{ width: 52 }}
+              >
+                Sr.No.
+              </th>
               {[
                 "Name",
                 "PAN",
@@ -569,7 +615,7 @@ export default function ClientMasterPage({
             {clients.length === 0 && (
               <tr>
                 <td
-                  colSpan={11}
+                  colSpan={12}
                   className="py-10 text-center text-gray-400"
                   data-ocid="clients.empty_state"
                 >
@@ -603,6 +649,12 @@ export default function ClientMasterPage({
                   data-ocid={`clients.item.${i + 1}`}
                   className={`border-b last:border-0 hover:bg-gray-50 ${i % 2 === 0 ? "" : "bg-gray-50/30"} ${alertRowClass}`}
                 >
+                  <td
+                    className="py-2.5 px-3 text-center text-xs text-gray-500 font-medium"
+                    style={{ width: 52 }}
+                  >
+                    {i + 1}
+                  </td>
                   <td className="py-2.5 px-3 font-medium">
                     <button
                       type="button"
@@ -935,6 +987,14 @@ export default function ClientMasterPage({
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* --- Import Modal -------------------------------------------------- */}
+      <ExcelImportDialog
+        open={importOpen}
+        onClose={() => setImportOpen(false)}
+        currentUserId={currentUserId}
+        onImportDone={() => setRefreshKey((k) => k + 1)}
+      />
 
       {/* Trial Upgrade Dialog */}
       <Dialog open={showUpgradeModal} onOpenChange={setShowUpgradeModal}>

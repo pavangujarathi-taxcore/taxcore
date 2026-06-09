@@ -1,0 +1,331 @@
+import { r as reactExports, ak as getImportHistory, o as onStorageChange, j as jsxRuntimeExports, B as Button, x as Download, R as RefreshCw, a7 as getHeadOfIncome } from "./index-D5ov2zgF.js";
+import { F as FileDown, G as GitMerge, u as utils, w as writeFileSync } from "./xlsx-CJhT2rDE.js";
+import { A as ArrowLeft } from "./arrow-left-BNi8jwA9.js";
+function downloadChanges(entry) {
+  const wb = utils.book_new();
+  const dateStr = new Date(entry.importedAt).toLocaleDateString("en-IN").replace(/\//g, "-");
+  const clientHeaders = [
+    "Sr.No.",
+    "Name",
+    "PAN",
+    "Head of Income",
+    "Business Name",
+    "Category",
+    "Tax Year",
+    "Due Date",
+    "Client Type",
+    "Mobile",
+    "Email",
+    "Created At"
+  ];
+  const clientRows = entry.changedRows.clients.length > 0 ? entry.changedRows.clients.map((c, idx) => [
+    idx + 1,
+    c.name,
+    c.pan,
+    getHeadOfIncome(c),
+    c.businessName || "-",
+    c.clientCategory,
+    c.taxYear,
+    c.dueDate,
+    c.clientType,
+    c.mobile,
+    c.email || "-",
+    new Date(c.createdAt).toLocaleDateString("en-IN")
+  ]) : [["No changes in this section"]];
+  utils.book_append_sheet(
+    wb,
+    utils.aoa_to_sheet([clientHeaders, ...clientRows]),
+    "Client Master"
+  );
+  const workHeaders = [
+    "Sr.No.",
+    "Client ID",
+    "Tax Year",
+    "Return Type",
+    "Work Status",
+    "Filing Status",
+    "ITR Form",
+    "Acknowledgement Number",
+    "Filing Date",
+    "Remarks"
+  ];
+  const workRows = entry.changedRows.workProcessing.length > 0 ? entry.changedRows.workProcessing.map((w, idx) => [
+    idx + 1,
+    w.clientId,
+    w.taxYear,
+    w.returnType || "Original",
+    w.status,
+    w.filingStatus || "Pending",
+    w.itrForm || "-",
+    w.ackNumber || "-",
+    w.filingDate || "-",
+    w.remark || "-"
+  ]) : [["No changes in this section"]];
+  utils.book_append_sheet(
+    wb,
+    utils.aoa_to_sheet([workHeaders, ...workRows]),
+    "Work Processing"
+  );
+  const docHeaders = [
+    "Sr.No.",
+    "Client ID",
+    "Date",
+    "Mode",
+    "Status",
+    "Remarks"
+  ];
+  const docRows = entry.changedRows.documentInward.length > 0 ? entry.changedRows.documentInward.map((d, idx) => [
+    idx + 1,
+    d.clientId,
+    d.date,
+    d.mode,
+    d.status,
+    d.remarks || "-"
+  ]) : [["No changes in this section"]];
+  utils.book_append_sheet(
+    wb,
+    utils.aoa_to_sheet([docHeaders, ...docRows]),
+    "Document Inward"
+  );
+  const billingHeaders = [
+    "Sr.No.",
+    "Client ID",
+    "Tax Year",
+    "Bill Amount (₹)",
+    "Receipt (₹)",
+    "Balance (₹)",
+    "Outward Status"
+  ];
+  const billingRows = entry.changedRows.billing.length > 0 ? entry.changedRows.billing.map((b, idx) => [
+    idx + 1,
+    b.clientId,
+    b.taxYear,
+    b.billAmount,
+    b.receipt,
+    b.balance,
+    b.outwardStatus
+  ]) : [["No changes in this section"]];
+  utils.book_append_sheet(
+    wb,
+    utils.aoa_to_sheet([billingHeaders, ...billingRows]),
+    "Billing"
+  );
+  writeFileSync(wb, `taxcore-import-changes-${dateStr}.xlsx`);
+}
+function ModeBadge({ mode }) {
+  if (mode === "Merge") {
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 border border-blue-200 text-blue-700", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(GitMerge, { className: "w-3 h-3" }),
+      " Merge"
+    ] });
+  }
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-700", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(RefreshCw, { className: "w-3 h-3" }),
+    " Replace"
+  ] });
+}
+function CountCell({
+  added,
+  updated,
+  skipped
+}) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-0.5 text-[11px] leading-tight", children: [
+    added > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-green-700 font-medium", children: [
+      added,
+      " added"
+    ] }),
+    updated > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-blue-700 font-medium", children: [
+      updated,
+      " updated"
+    ] }),
+    skipped > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-gray-400", children: [
+      skipped,
+      " skipped"
+    ] }),
+    added === 0 && updated === 0 && skipped === 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-300", children: "—" })
+  ] });
+}
+function ImportHistoryPage({ onBack }) {
+  const [history, setHistory] = reactExports.useState(
+    () => getImportHistory().slice().sort(
+      (a, b) => new Date(b.importedAt).getTime() - new Date(a.importedAt).getTime()
+    )
+  );
+  reactExports.useEffect(() => {
+    const unsub = onStorageChange(() => {
+      setHistory(
+        getImportHistory().slice().sort(
+          (a, b) => new Date(b.importedAt).getTime() - new Date(a.importedAt).getTime()
+        )
+      );
+    });
+    return unsub;
+  }, []);
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-5 max-w-6xl", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center gap-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      "button",
+      {
+        type: "button",
+        onClick: onBack,
+        className: "inline-flex items-center gap-1.5 text-sm font-medium hover:opacity-80 transition-opacity",
+        style: { color: "var(--theme-primary, #6B1A2B)" },
+        "data-ocid": "import_history.back_button",
+        children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowLeft, { className: "w-4 h-4" }),
+          "Back to Export"
+        ]
+      }
+    ) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        "h2",
+        {
+          className: "text-lg font-semibold mb-1",
+          style: { color: "var(--theme-primary, #6B1A2B)" },
+          children: "Import History"
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500", children: "A log of all past Excel imports. Download the changed rows from any import as an Excel file." })
+    ] }),
+    history.length === 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      "div",
+      {
+        className: "rounded-xl border-2 border-dashed flex flex-col items-center justify-center py-16 text-center",
+        style: { borderColor: "rgba(107,26,43,0.18)" },
+        "data-ocid": "import_history.empty_state",
+        children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "div",
+            {
+              className: "w-14 h-14 rounded-full flex items-center justify-center mb-4",
+              style: { background: "rgba(107,26,43,0.07)" },
+              children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                FileDown,
+                {
+                  className: "w-7 h-7",
+                  style: { color: "var(--theme-primary, #6B1A2B)" }
+                }
+              )
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "p",
+            {
+              className: "text-base font-semibold mb-1",
+              style: { color: "var(--theme-primary, #6B1A2B)" },
+              children: "No imports yet"
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-400 max-w-xs", children: "Once you import data from Excel, each import will appear here with a full record of what changed." })
+        ]
+      }
+    ),
+    history.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(
+      "div",
+      {
+        className: "rounded-xl border overflow-hidden",
+        style: { borderColor: "rgba(107,26,43,0.15)" },
+        "data-ocid": "import_history.table",
+        children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-x-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("table", { className: "w-full min-w-[860px] text-sm", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("thead", { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "tr",
+            {
+              style: {
+                background: "var(--theme-primary, #6B1A2B)"
+              },
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "text-left py-3 px-3 text-white font-semibold text-xs w-10", children: "#" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "text-left py-3 px-3 text-white font-semibold text-xs whitespace-nowrap", children: "Date & Time" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "text-left py-3 px-3 text-white font-semibold text-xs", children: "Mode" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "text-left py-3 px-3 text-white font-semibold text-xs", children: "Imported By" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "text-left py-3 px-3 text-white font-semibold text-xs", children: "Client Master" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "text-left py-3 px-3 text-white font-semibold text-xs", children: "Work Processing" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "text-left py-3 px-3 text-white font-semibold text-xs", children: "Documents" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "text-left py-3 px-3 text-white font-semibold text-xs", children: "Billing" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "text-left py-3 px-3 text-white font-semibold text-xs", children: "Actions" })
+              ]
+            }
+          ) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("tbody", { children: history.map((entry, idx) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "tr",
+            {
+              className: "border-b last:border-0 hover:bg-gray-50 transition-colors",
+              style: { borderColor: "rgba(107,26,43,0.08)" },
+              "data-ocid": `import_history.item.${idx + 1}`,
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "py-3 px-3 text-gray-400 text-xs font-mono", children: idx + 1 }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("td", { className: "py-3 px-3 whitespace-nowrap", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs font-medium text-gray-800", children: new Date(entry.importedAt).toLocaleDateString(
+                    "en-IN",
+                    { day: "2-digit", month: "short", year: "numeric" }
+                  ) }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-[11px] text-gray-400", children: new Date(entry.importedAt).toLocaleTimeString(
+                    "en-IN",
+                    { hour: "2-digit", minute: "2-digit", hour12: true }
+                  ) })
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "py-3 px-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ModeBadge, { mode: entry.mode }) }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "py-3 px-3 text-xs text-gray-700 font-medium", children: entry.importedBy }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "py-3 px-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CountCell, { ...entry.tabCounts.clients }) }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "py-3 px-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CountCell, { ...entry.tabCounts.workProcessing }) }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "py-3 px-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CountCell, { ...entry.tabCounts.documentInward }) }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "py-3 px-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CountCell, { ...entry.tabCounts.billing }) }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "py-3 px-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                  Button,
+                  {
+                    size: "sm",
+                    variant: "outline",
+                    onClick: () => downloadChanges(entry),
+                    className: "gap-1.5 text-xs h-7",
+                    style: {
+                      borderColor: "var(--theme-primary, #6B1A2B)",
+                      color: "var(--theme-primary, #6B1A2B)"
+                    },
+                    "data-ocid": `import_history.download_button.${idx + 1}`,
+                    children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(Download, { className: "w-3 h-3" }),
+                      "Download Changes"
+                    ]
+                  }
+                ) })
+              ]
+            },
+            entry.id
+          )) })
+        ] }) })
+      }
+    ),
+    history.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      "div",
+      {
+        className: "rounded-lg border p-3 text-xs text-gray-500",
+        style: {
+          background: "#f9f7f4",
+          borderColor: "rgba(107,26,43,0.1)"
+        },
+        children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-medium text-gray-700 mb-1", children: "Download Changes Notes:" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "space-y-0.5 list-disc list-inside", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Downloads an .xlsx file with 4 sheets: Client Master, Work Processing, Document Inward, Billing" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: "Only rows added or modified during that import are included" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("li", { children: 'Sheets with no changes show "No changes in this section"' }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { children: [
+              "File is named:",
+              " ",
+              /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "font-mono text-gray-600", children: "taxcore-import-changes-DD-MM-YYYY.xlsx" })
+            ] })
+          ] })
+        ]
+      }
+    ),
+    history.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-gray-400 text-right", children: [
+      history.length,
+      " import",
+      history.length !== 1 ? "s" : "",
+      " in history"
+    ] })
+  ] });
+}
+export {
+  ImportHistoryPage as default
+};

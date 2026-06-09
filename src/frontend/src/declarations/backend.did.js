@@ -13,16 +13,153 @@ export const UserRole = IDL.Variant({
   'user' : IDL.Null,
   'guest' : IDL.Null,
 });
+export const FirmId = IDL.Text;
+export const WriteResult = IDL.Record({
+  'ok' : IDL.Bool,
+  'message' : IDL.Text,
+});
+export const FirmSummary = IDL.Record({
+  'ownerEmail' : IDL.Text,
+  'status' : IDL.Text,
+  'ownerName' : IDL.Text,
+  'firmNumber' : IDL.Text,
+  'clientCount' : IDL.Nat,
+  'firmName' : IDL.Text,
+  'firmId' : FirmId,
+  'lastLogin' : IDL.Int,
+  'planType' : IDL.Text,
+  'ownerMobile' : IDL.Text,
+});
+export const FirmMigrationCount = IDL.Record({
+  'firmNumber' : IDL.Text,
+  'firmId' : FirmId,
+  'recordCount' : IDL.Nat,
+});
+export const MigrationResult = IDL.Record({
+  'ok' : IDL.Bool,
+  'perFirmCounts' : IDL.Vec(FirmMigrationCount),
+  'skipped' : IDL.Bool,
+  'message' : IDL.Text,
+  'orphanedCount' : IDL.Nat,
+  'totalRecords' : IDL.Nat,
+});
+export const WriteContext = IDL.Record({
+  'userId' : IDL.Text,
+  'role' : IDL.Text,
+  'firmId' : FirmId,
+});
+export const FirmAssignmentDetail = IDL.Record({
+  'assigned' : IDL.Nat,
+  'firmNumber' : IDL.Text,
+  'firmId' : FirmId,
+});
+export const ScanResult = IDL.Record({
+  'ok' : IDL.Bool,
+  'totalRecordsScanned' : IDL.Nat,
+  'assigned' : IDL.Nat,
+  'skipped' : IDL.Bool,
+  'hadFirmId' : IDL.Nat,
+  'missingFirmId' : IDL.Nat,
+  'unmatched' : IDL.Nat,
+  'message' : IDL.Text,
+  'perFirmDetails' : IDL.Vec(FirmAssignmentDetail),
+});
 
 export const idlService = IDL.Service({
   '_initializeAccessControl' : IDL.Func([], [], []),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+  'backfillFirmNumbers' : IDL.Func([], [IDL.Nat], []),
+  'forceRecoverFirmData' : IDL.Func(
+      [IDL.Text, FirmId, IDL.Text, IDL.Nat],
+      [WriteResult],
+      [],
+    ),
+  'getActiveFirmAppData' : IDL.Func([FirmId, IDL.Text], [IDL.Text], []),
+  'getAllFirmSummaries' : IDL.Func([IDL.Text], [IDL.Vec(FirmSummary)], []),
+  'getAutoAssignStatus' : IDL.Func(
+      [],
+      [
+        IDL.Record({
+          'migratedRecords' : IDL.Nat,
+          'autoAssignVersion' : IDL.Nat,
+          'autoAssignRan' : IDL.Bool,
+          'adminFirmId' : IDL.Text,
+        }),
+      ],
+      ['query'],
+    ),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+  'getFirmAppData' : IDL.Func([FirmId, IDL.Text], [IDL.Text], []),
+  'getFirmAppDataCount' : IDL.Func([], [IDL.Nat], ['query']),
+  'getFirmUserData' : IDL.Func([FirmId, IDL.Text], [IDL.Text], []),
   'getGlobalAppData' : IDL.Func([], [IDL.Text], ['query']),
   'getGlobalUserDatabase' : IDL.Func([], [IDL.Text], ['query']),
+  'getMigrationStatus' : IDL.Func(
+      [],
+      [
+        IDL.Record({
+          'migratedRecords' : IDL.Nat,
+          'autoAssignVersion' : IDL.Nat,
+          'migrated' : IDL.Bool,
+          'autoAssignRan' : IDL.Bool,
+          'migrationVersion' : IDL.Nat,
+          'adminFirmId' : IDL.Text,
+        }),
+      ],
+      ['query'],
+    ),
+  'getMigrationVersion' : IDL.Func([], [IDL.Nat], ['query']),
+  'getNextFirmNumber' : IDL.Func([FirmId], [IDL.Text], []),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
+  'migrateExistingDataToAdminFirm' : IDL.Func(
+      [FirmId, IDL.Text, IDL.Text],
+      [WriteResult],
+      [],
+    ),
+  'migratePreIsolationData' : IDL.Func(
+      [
+        IDL.Text,
+        FirmId,
+        IDL.Vec(IDL.Tuple(FirmId, IDL.Text)),
+        IDL.Text,
+        IDL.Nat,
+        IDL.Text,
+      ],
+      [MigrationResult],
+      [],
+    ),
+  'needsAutoAssign' : IDL.Func([], [IDL.Bool], ['query']),
+  'peekNextFirmNumber' : IDL.Func([], [IDL.Text], ['query']),
+  'registerFirm' : IDL.Func(
+      [FirmId, IDL.Text, IDL.Text, IDL.Text, IDL.Text],
+      [WriteResult],
+      [],
+    ),
+  'resetAutoAssign' : IDL.Func([IDL.Text], [WriteResult], []),
+  'saveFirmAppData' : IDL.Func([WriteContext, IDL.Text], [WriteResult], []),
+  'saveFirmUserData' : IDL.Func([WriteContext, IDL.Text], [WriteResult], []),
   'saveGlobalAppData' : IDL.Func([IDL.Text], [], []),
   'saveGlobalUserDatabase' : IDL.Func([IDL.Text], [], []),
+  'scanAndAutoAssignFirmIds' : IDL.Func(
+      [
+        IDL.Text,
+        FirmId,
+        IDL.Vec(IDL.Tuple(FirmId, IDL.Text, IDL.Nat)),
+        IDL.Text,
+        IDL.Nat,
+        IDL.Nat,
+        IDL.Nat,
+        IDL.Nat,
+        IDL.Bool,
+      ],
+      [ScanResult],
+      [],
+    ),
+  'updateFirmPlan' : IDL.Func(
+      [IDL.Text, FirmId, IDL.Text, IDL.Text],
+      [WriteResult],
+      [],
+    ),
 });
 
 export const idlInitArgs = [];
@@ -33,16 +170,150 @@ export const idlFactory = ({ IDL }) => {
     'user' : IDL.Null,
     'guest' : IDL.Null,
   });
+  const FirmId = IDL.Text;
+  const WriteResult = IDL.Record({ 'ok' : IDL.Bool, 'message' : IDL.Text });
+  const FirmSummary = IDL.Record({
+    'ownerEmail' : IDL.Text,
+    'status' : IDL.Text,
+    'ownerName' : IDL.Text,
+    'firmNumber' : IDL.Text,
+    'clientCount' : IDL.Nat,
+    'firmName' : IDL.Text,
+    'firmId' : FirmId,
+    'lastLogin' : IDL.Int,
+    'planType' : IDL.Text,
+    'ownerMobile' : IDL.Text,
+  });
+  const FirmMigrationCount = IDL.Record({
+    'firmNumber' : IDL.Text,
+    'firmId' : FirmId,
+    'recordCount' : IDL.Nat,
+  });
+  const MigrationResult = IDL.Record({
+    'ok' : IDL.Bool,
+    'perFirmCounts' : IDL.Vec(FirmMigrationCount),
+    'skipped' : IDL.Bool,
+    'message' : IDL.Text,
+    'orphanedCount' : IDL.Nat,
+    'totalRecords' : IDL.Nat,
+  });
+  const WriteContext = IDL.Record({
+    'userId' : IDL.Text,
+    'role' : IDL.Text,
+    'firmId' : FirmId,
+  });
+  const FirmAssignmentDetail = IDL.Record({
+    'assigned' : IDL.Nat,
+    'firmNumber' : IDL.Text,
+    'firmId' : FirmId,
+  });
+  const ScanResult = IDL.Record({
+    'ok' : IDL.Bool,
+    'totalRecordsScanned' : IDL.Nat,
+    'assigned' : IDL.Nat,
+    'skipped' : IDL.Bool,
+    'hadFirmId' : IDL.Nat,
+    'missingFirmId' : IDL.Nat,
+    'unmatched' : IDL.Nat,
+    'message' : IDL.Text,
+    'perFirmDetails' : IDL.Vec(FirmAssignmentDetail),
+  });
   
   return IDL.Service({
     '_initializeAccessControl' : IDL.Func([], [], []),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+    'backfillFirmNumbers' : IDL.Func([], [IDL.Nat], []),
+    'forceRecoverFirmData' : IDL.Func(
+        [IDL.Text, FirmId, IDL.Text, IDL.Nat],
+        [WriteResult],
+        [],
+      ),
+    'getActiveFirmAppData' : IDL.Func([FirmId, IDL.Text], [IDL.Text], []),
+    'getAllFirmSummaries' : IDL.Func([IDL.Text], [IDL.Vec(FirmSummary)], []),
+    'getAutoAssignStatus' : IDL.Func(
+        [],
+        [
+          IDL.Record({
+            'migratedRecords' : IDL.Nat,
+            'autoAssignVersion' : IDL.Nat,
+            'autoAssignRan' : IDL.Bool,
+            'adminFirmId' : IDL.Text,
+          }),
+        ],
+        ['query'],
+      ),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+    'getFirmAppData' : IDL.Func([FirmId, IDL.Text], [IDL.Text], []),
+    'getFirmAppDataCount' : IDL.Func([], [IDL.Nat], ['query']),
+    'getFirmUserData' : IDL.Func([FirmId, IDL.Text], [IDL.Text], []),
     'getGlobalAppData' : IDL.Func([], [IDL.Text], ['query']),
     'getGlobalUserDatabase' : IDL.Func([], [IDL.Text], ['query']),
+    'getMigrationStatus' : IDL.Func(
+        [],
+        [
+          IDL.Record({
+            'migratedRecords' : IDL.Nat,
+            'autoAssignVersion' : IDL.Nat,
+            'migrated' : IDL.Bool,
+            'autoAssignRan' : IDL.Bool,
+            'migrationVersion' : IDL.Nat,
+            'adminFirmId' : IDL.Text,
+          }),
+        ],
+        ['query'],
+      ),
+    'getMigrationVersion' : IDL.Func([], [IDL.Nat], ['query']),
+    'getNextFirmNumber' : IDL.Func([FirmId], [IDL.Text], []),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
+    'migrateExistingDataToAdminFirm' : IDL.Func(
+        [FirmId, IDL.Text, IDL.Text],
+        [WriteResult],
+        [],
+      ),
+    'migratePreIsolationData' : IDL.Func(
+        [
+          IDL.Text,
+          FirmId,
+          IDL.Vec(IDL.Tuple(FirmId, IDL.Text)),
+          IDL.Text,
+          IDL.Nat,
+          IDL.Text,
+        ],
+        [MigrationResult],
+        [],
+      ),
+    'needsAutoAssign' : IDL.Func([], [IDL.Bool], ['query']),
+    'peekNextFirmNumber' : IDL.Func([], [IDL.Text], ['query']),
+    'registerFirm' : IDL.Func(
+        [FirmId, IDL.Text, IDL.Text, IDL.Text, IDL.Text],
+        [WriteResult],
+        [],
+      ),
+    'resetAutoAssign' : IDL.Func([IDL.Text], [WriteResult], []),
+    'saveFirmAppData' : IDL.Func([WriteContext, IDL.Text], [WriteResult], []),
+    'saveFirmUserData' : IDL.Func([WriteContext, IDL.Text], [WriteResult], []),
     'saveGlobalAppData' : IDL.Func([IDL.Text], [], []),
     'saveGlobalUserDatabase' : IDL.Func([IDL.Text], [], []),
+    'scanAndAutoAssignFirmIds' : IDL.Func(
+        [
+          IDL.Text,
+          FirmId,
+          IDL.Vec(IDL.Tuple(FirmId, IDL.Text, IDL.Nat)),
+          IDL.Text,
+          IDL.Nat,
+          IDL.Nat,
+          IDL.Nat,
+          IDL.Nat,
+          IDL.Bool,
+        ],
+        [ScanResult],
+        [],
+      ),
+    'updateFirmPlan' : IDL.Func(
+        [IDL.Text, FirmId, IDL.Text, IDL.Text],
+        [WriteResult],
+        [],
+      ),
   });
 };
 

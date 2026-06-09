@@ -33,7 +33,7 @@ import {
   queueDueDateNotifications,
   refreshFromCanister,
   storage,
-} from "../data/storage-api";
+} from "../data/storage";
 import type { Client, User, WorkProcessing } from "../types";
 import { getTaxYears } from "../utils/taxYears";
 
@@ -126,51 +126,73 @@ const TAB_DEFS = [
 type TabKey = (typeof TAB_DEFS)[number]["key"];
 
 function computeStats(taxYear: string, userId: string, userRole: string) {
-  let allClients = storage.getClients();
+  let accessibleClients = storage.getClients();
   // Staff: only see their own clients
   if (userRole === "Staff") {
-    allClients = allClients.filter((c) => c.createdBy === userId);
+    accessibleClients = accessibleClients.filter((c) => c.createdBy === userId);
   }
-  const clients: Client[] =
+
+  // Total clients count: if All years, count all accessible; if specific year, count by year
+  const totalClients =
     taxYear === "All"
-      ? allClients
-      : allClients.filter((c) => c.taxYear === taxYear);
+      ? accessibleClients.length
+      : accessibleClients.filter((c) => c.taxYear === taxYear).length;
+
+  // For table display: show clients matching the tax year filter
+  const displayClients: Client[] =
+    taxYear === "All"
+      ? accessibleClients
+      : accessibleClients.filter((c) => c.taxYear === taxYear);
+
+  const accessibleClientIds = new Set(accessibleClients.map((c) => c.id));
   const allWork = storage.getWork();
   const allBilling = storage.getBilling();
 
-  const clientIds = new Set(clients.map((c) => c.id));
-  const work = allWork.filter((w) => clientIds.has(w.clientId));
-  const billing = allBilling.filter((b) => clientIds.has(b.clientId));
+  // Work scoped to accessible clients first
+  const scopedWork = allWork.filter((w) => accessibleClientIds.has(w.clientId));
 
-  const recentClients = allClients.slice(-10).reverse();
+  // Then filter by tax year
+  const filteredWork =
+    taxYear === "All"
+      ? scopedWork
+      : scopedWork.filter((w) => w.taxYear === taxYear);
+
+  // Billing scoped to display clients
+  const displayClientIds = new Set(displayClients.map((c) => c.id));
+  const billing = allBilling.filter((b) => displayClientIds.has(b.clientId));
+
+  // Recent clients: from accessible clients (last 10)
+  const recentClients = accessibleClients.slice(-10).reverse();
 
   // Pending Work = Work Status is Pending or In Progress
-  const pending = work.filter(
+  const pending = filteredWork.filter(
     (w) => w.status === "Pending" || w.status === "In Progress",
   ).length;
 
-  // Pending ITR Filed = Filing Status is Pending (return not yet filed)
-  const pendingITR = work.filter(
-    (w) => !w.filingStatus || w.filingStatus === "Pending",
+  // Pending ITR Filed = Work Status is Completed (ITR prepared, pending submission)
+  const pendingITR = filteredWork.filter(
+    (w) => w.status === "Completed",
   ).length;
 
   // ITR Filed = E-Verified + Pending for E-verification (return has been filed)
-  const itrFiled = work.filter(
+  const itrFiled = filteredWork.filter(
     (w) =>
       w.filingStatus === "E-Verified" ||
       w.filingStatus === "Pending for E-verification",
   ).length;
 
   // Pending for Verification = returns awaiting e-verification
-  const pendingForVerification = work.filter(
+  const pendingForVerification = filteredWork.filter(
     (w) => w.filingStatus === "Pending for E-verification",
   ).length;
 
   // E-Verified = fully e-verified
-  const eVerified = work.filter((w) => w.filingStatus === "E-Verified").length;
+  const eVerified = filteredWork.filter(
+    (w) => w.filingStatus === "E-Verified",
+  ).length;
 
   return {
-    total: clients.length,
+    total: totalClients,
     pending,
     pendingITR,
     itrFiled,
@@ -178,7 +200,8 @@ function computeStats(taxYear: string, userId: string, userRole: string) {
     eVerified,
     ready: billing.filter((b) => b.outwardStatus === "Ready").length,
     recentClients,
-    clients,
+    clients: displayClients,
+    filteredWork,
   };
 }
 
@@ -338,7 +361,7 @@ export default function DashboardPage({ user }: DashboardPageProps) {
     }
   };
 
-  // Tab count values
+  // Tab count values — each count reflects the filtered-by-taxYear work records
   const tabCounts: Record<TabKey, number> = {
     total: stats.total,
     pending: stats.pending,
@@ -348,11 +371,9 @@ export default function DashboardPage({ user }: DashboardPageProps) {
     eVerified: stats.eVerified,
   };
 
-  // Get filtered clients for current tab
-  const allWork = storage.getWork();
+  // Get filtered clients for current tab using the pre-filtered work array from stats
   const getTabClients = (): Client[] => {
-    const clientIds = new Set(stats.clients.map((c) => c.id));
-    const filteredWork = allWork.filter((w) => clientIds.has(w.clientId));
+    const filteredWork = stats.filteredWork;
     if (activeTab === "total") return stats.clients;
     if (activeTab === "pending")
       return stats.clients.filter((c) => {
@@ -362,7 +383,7 @@ export default function DashboardPage({ user }: DashboardPageProps) {
     if (activeTab === "pendingITR")
       return stats.clients.filter((c) => {
         const w = filteredWork.find((fw) => fw.clientId === c.id);
-        return !w?.filingStatus || w?.filingStatus === "Pending";
+        return w?.status === "Completed";
       });
     if (activeTab === "itrFiled")
       return stats.clients.filter((c) => {
@@ -521,7 +542,7 @@ export default function DashboardPage({ user }: DashboardPageProps) {
         </button>
       </div>
 
-      {/* Tab Strip — 6 tabs, single non-wrapping row */}
+      {/* Tab Strip \u2014 6 tabs, single non-wrapping row */}
       {cardsLoading ? (
         <div
           className="flex gap-2"
@@ -658,7 +679,7 @@ export default function DashboardPage({ user }: DashboardPageProps) {
                     </span>
                   </button>
 
-                  {/* Hover Tooltip — rendered outside overflow-hidden parent */}
+                  {/* Hover Tooltip \u2014 rendered outside overflow-hidden parent */}
                   {hoveredTab === tab.key && (
                     <div
                       style={{
@@ -934,6 +955,7 @@ export default function DashboardPage({ user }: DashboardPageProps) {
                       }}
                     >
                       {[
+                        "Sr.No.",
                         "Client Name",
                         "PAN",
                         "Filed On",
@@ -944,7 +966,11 @@ export default function DashboardPage({ user }: DashboardPageProps) {
                         <th
                           key={h}
                           className="text-left py-2 px-2 font-semibold text-xs"
-                          style={{ color: "#fff" }}
+                          style={{
+                            color: "#fff",
+                            width: h === "Sr.No." ? "52px" : undefined,
+                            textAlign: h === "Sr.No." ? "center" : undefined,
+                          }}
                         >
                           {h}
                         </th>
@@ -952,7 +978,7 @@ export default function DashboardPage({ user }: DashboardPageProps) {
                     </tr>
                   </thead>
                   <tbody>
-                    {tabClients.map((client) => {
+                    {tabClients.map((client, idx) => {
                       const work = getClientWork(client.id);
                       return (
                         <tr
@@ -960,6 +986,12 @@ export default function DashboardPage({ user }: DashboardPageProps) {
                           className="border-b last:border-0 hover:bg-gray-50"
                           data-ocid="dashboard.everified.row"
                         >
+                          <td
+                            className="py-1.5 px-2 text-xs text-gray-500 font-mono"
+                            style={{ textAlign: "center", width: "52px" }}
+                          >
+                            {idx + 1}
+                          </td>
                           <td className="py-1.5 px-2 font-medium text-xs">
                             {client.name}
                           </td>
@@ -973,7 +1005,7 @@ export default function DashboardPage({ user }: DashboardPageProps) {
                             {work?.filingDate || "\u2014"}
                           </td>
                           <td className="py-1.5 px-2 text-xs text-gray-500">
-                            \u2014
+                            {"\u2014"}
                           </td>
                           <td className="py-1.5 px-2">
                             <span
@@ -992,7 +1024,7 @@ export default function DashboardPage({ user }: DashboardPageProps) {
                     {tabClients.length === 0 && (
                       <tr>
                         <td
-                          colSpan={6}
+                          colSpan={7}
                           className="py-6 text-center text-gray-400"
                           data-ocid="dashboard.everified.empty_state"
                         >
@@ -1007,7 +1039,7 @@ export default function DashboardPage({ user }: DashboardPageProps) {
           </Card>
         </div>
       ) : (
-        /* Tabs 1–5: Standard clients table */
+        /* Tabs 1\u20135: Standard clients table */
         <Card className="shadow-sm">
           <CardHeader className="pb-2 pt-3 px-3">
             <CardTitle
@@ -1016,15 +1048,21 @@ export default function DashboardPage({ user }: DashboardPageProps) {
             >
               {activeTab === "total"
                 ? "Recent Clients (last 10)"
-                : `${TAB_DEFS.find((t) => t.key === activeTab)?.label ?? ""} — ${tabClients.length} client${tabClients.length !== 1 ? "s" : ""}`}
+                : `${TAB_DEFS.find((t) => t.key === activeTab)?.label ?? ""} \u2014 ${tabClients.length} client${tabClients.length !== 1 ? "s" : ""}`}
             </CardTitle>
           </CardHeader>
           <CardContent className="px-3 pb-3 pt-0">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b">
+                  <tr
+                    className="border-b"
+                    style={{
+                      background: "var(--theme-table-header-bg, #6B1414)",
+                    }}
+                  >
                     {[
+                      "Sr.No.",
                       "Name",
                       "PAN",
                       "Client Type",
@@ -1037,7 +1075,12 @@ export default function DashboardPage({ user }: DashboardPageProps) {
                     ].map((h) => (
                       <th
                         key={h}
-                        className="text-left py-1.5 px-2 font-semibold text-gray-600 text-xs"
+                        className="text-left py-1.5 px-2 font-semibold text-xs"
+                        style={{
+                          color: "#fff",
+                          width: h === "Sr.No." ? "52px" : undefined,
+                          textAlign: h === "Sr.No." ? "center" : undefined,
+                        }}
                       >
                         {h}
                       </th>
@@ -1048,7 +1091,7 @@ export default function DashboardPage({ user }: DashboardPageProps) {
                   {(activeTab === "total"
                     ? stats.recentClients
                     : tabClients
-                  ).map((client) => {
+                  ).map((client, idx) => {
                     const work = getClientWork(client.id);
                     const docStatus = getLatestDocStatus(client.id);
                     const docHasEntry = docStatus !== "-";
@@ -1073,6 +1116,12 @@ export default function DashboardPage({ user }: DashboardPageProps) {
                         className="border-b last:border-0 hover:bg-gray-50"
                         data-ocid="dashboard.client.row"
                       >
+                        <td
+                          className="py-1.5 px-2 text-xs text-gray-500 font-mono"
+                          style={{ textAlign: "center", width: "52px" }}
+                        >
+                          {idx + 1}
+                        </td>
                         <td className="py-1.5 px-2 font-medium text-xs">
                           {client.name}
                         </td>
@@ -1102,7 +1151,7 @@ export default function DashboardPage({ user }: DashboardPageProps) {
                             </span>
                           ) : (
                             <span className="text-xs text-gray-300">
-                              \u2014
+                              {"\u2014"}
                             </span>
                           )}
                         </td>
@@ -1113,7 +1162,7 @@ export default function DashboardPage({ user }: DashboardPageProps) {
                             </span>
                           ) : (
                             <span className="text-xs text-gray-300">
-                              \u2014
+                              {"\u2014"}
                             </span>
                           )}
                         </td>
@@ -1155,7 +1204,7 @@ export default function DashboardPage({ user }: DashboardPageProps) {
                     .length === 0 && (
                     <tr>
                       <td
-                        colSpan={9}
+                        colSpan={10}
                         className="py-6 text-center text-gray-400"
                         data-ocid="dashboard.empty_state"
                       >

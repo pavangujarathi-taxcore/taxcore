@@ -10,7 +10,7 @@ import { CheckCircle, Edit2, Lock, Search } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import DatePickerInput from "../components/DatePickerInput";
-import { getFilingStatus, onStorageChange, storage } from "../data/storage-api";
+import { getFilingStatus, onStorageChange, storage } from "../data/storage";
 import type { Client, User, WorkProcessing } from "../types";
 import { getTaxYears } from "../utils/taxYears";
 
@@ -605,6 +605,12 @@ export default function WorkProcessingPage({ user }: WorkProcessingPageProps) {
         <table className="w-full text-sm">
           <thead style={{ background: "var(--theme-primary, #6B1A2B)" }}>
             <tr>
+              <th
+                className="text-center py-3 px-3 text-white font-medium text-xs"
+                style={{ width: 52 }}
+              >
+                Sr.No.
+              </th>
               {[
                 "Client",
                 "PAN",
@@ -628,7 +634,7 @@ export default function WorkProcessingPage({ user }: WorkProcessingPageProps) {
           <tbody>
             {rows.length === 0 && (
               <tr>
-                <td colSpan={9} className="py-8 text-center text-gray-400">
+                <td colSpan={10} className="py-8 text-center text-gray-400">
                   No work records found
                 </td>
               </tr>
@@ -655,6 +661,12 @@ export default function WorkProcessingPage({ user }: WorkProcessingPageProps) {
                               : "bg-gray-50/30"
                   }`}
                 >
+                  <td
+                    className="py-2.5 px-3 text-center text-xs text-gray-500 font-medium"
+                    style={{ width: 52 }}
+                  >
+                    {i + 1}
+                  </td>
                   <td className="py-2.5 px-3 font-medium text-xs">
                     {row.clientName}
                   </td>
